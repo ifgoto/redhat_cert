@@ -143,6 +143,9 @@ multi-user.target
 rm '/etc/systemd/system/default.target'
 ln -s '/usr/lib/systemd/system/graphical.target' '/etc/systemd/system/default.target'
 ```
+重启后是图型界面
+![](res/after-graphcal-reboot-gui.png)
+
 
 # 教学环境介绍
 (看是否需要先略过, 暂时先略过)
@@ -150,6 +153,7 @@ ln -s '/usr/lib/systemd/system/graphical.target' '/etc/systemd/system/default.ta
 - server
 - classroom
 
+下面的X,对于统一提供的虚拟机为0,即IP为172.25.0.10
 |Machine name|IP addresses|Role|
 |:---|:---|:---|
 |desktopX.example.com|172.25.X.10| Student "client" computer|
