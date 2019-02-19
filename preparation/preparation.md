@@ -154,11 +154,14 @@ ln -s '/usr/lib/systemd/system/graphical.target' '/etc/systemd/system/default.ta
 - classroom
 
 下面的X,对于统一提供的虚拟机为0,即IP为172.25.0.10
+
 |Machine name|IP addresses|Role|
 |:---|:---|:---|
 |desktopX.example.com|172.25.X.10| Student "client" computer|
 |serverX.example.com|172.25.X.11| Student "server" computer|
 |classroom.example.com|172.25.254.254 |Classroom utility server|
+
+<br>
 
 |机器|用户名|密码|
 |:---:|:---:|:----:|
