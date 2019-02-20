@@ -1,4 +1,4 @@
-# plan
+#19的练习 plan
 |上课时间|课程模块|课程内容|重点项目案例|
 |:---|:---|:---|:---|
 |上午|访问命令行| 本地访问控制台<br> 在桌面上运行命令行<br> 在bash shell中执行命令行| 实战案例1:本地控制台访问权限术语<br> 实战案例2:用GNOME 3桌面环境<br> 实战案例3:命令和键盘快捷方式<br> 实战案例4:运行命令行<br> |
@@ -158,12 +158,350 @@ Wed Feb 20 01:03:00 CST 2019
 Wed Feb 20 01:03:01 CST 2019
 ```
 ### 命令的三大组成部分
+相信大家到现在已对命令有一些认识了.
+那么我们对命令行的组成, 分解一下,大体由下面三部分组成.
 
-### 124P5的 practise需要演示一下
+- 要运行的命令
+
+- 选项
+
+- 参数
 
 
-## 在桌面上运行命令行
+<br>
+
+下面以`ls -l /tmp`为例子进行说明
+<br>
+ls就是要运行的命令,  -l 为选项, 选项的存在是为了微调命令的具体行为模式, 当然, 有时选项可能不止一个,
+而下面这时, 往往把选项分开写与合起来写是等价的,如
+
+```bash
+[kiosk@foundation0 ~]$ ls -lrt /tmp
+total 4
+drwx------. 3 root  root    16 Mar 15  2016 systemd-private-OubRNT
+drwx------. 3 root  root    16 Mar 15  2016 systemd-private-FT78eE
+drwx------. 3 root  root    16 Mar 15  2016 systemd-private-YS6BdK
+drwx------. 3 root  root    16 Mar 15  2016 systemd-private-vr3kVr
+drwx------. 3 root  root    16 Nov  1  2016 systemd-private-TeeKb2
+drwx------. 3 root  root    16 Nov  1  2016 systemd-private-FdCa0Z
+drwx------. 3 root  root    16 Nov  1  2016 systemd-private-5hPaeh
+drwx------. 3 root  root    16 Nov  1  2016 systemd-private-9zHuNx
+drwxr-xr-x. 3 root  root    33 Feb 19 06:04 mytmp
+drwx------. 2 root  root  4096 Feb 19 06:10 vmware-root
+drwx------. 2 kiosk kiosk   24 Feb 19 07:29 ssh-nFeAOz1Qy3
+drwx------. 2 kiosk kiosk   23 Feb 19 10:16 ssh-lbbMsdg5OE
+drwx------. 3 root  root    16 Feb 21 07:05 systemd-private-qpwaAz
+drwx------. 3 root  root    16 Feb 21 07:05 systemd-private-tLzIhP
+drwx------. 3 root  root    16 Feb 21 07:05 systemd-private-Zx7gVA
+drwx------. 2 kiosk kiosk   23 Feb 21 07:06 ssh-aeISVxyM1Mq5
+drwx------. 3 root  root    16 Feb 21 07:06 systemd-private-vTORO3
+[kiosk@foundation0 ~]$ ls -l -r -t /tmp
+total 4
+drwx------. 3 root  root    16 Mar 15  2016 systemd-private-OubRNT
+drwx------. 3 root  root    16 Mar 15  2016 systemd-private-FT78eE
+drwx------. 3 root  root    16 Mar 15  2016 systemd-private-YS6BdK
+drwx------. 3 root  root    16 Mar 15  2016 systemd-private-vr3kVr
+drwx------. 3 root  root    16 Nov  1  2016 systemd-private-TeeKb2
+drwx------. 3 root  root    16 Nov  1  2016 systemd-private-FdCa0Z
+drwx------. 3 root  root    16 Nov  1  2016 systemd-private-5hPaeh
+drwx------. 3 root  root    16 Nov  1  2016 systemd-private-9zHuNx
+drwxr-xr-x. 3 root  root    33 Feb 19 06:04 mytmp
+drwx------. 2 root  root  4096 Feb 19 06:10 vmware-root
+drwx------. 2 kiosk kiosk   24 Feb 19 07:29 ssh-nFeAOz1Qy3
+drwx------. 2 kiosk kiosk   23 Feb 19 10:16 ssh-lbbMsdg5OE
+drwx------. 3 root  root    16 Feb 21 07:05 systemd-private-qpwaAz
+drwx------. 3 root  root    16 Feb 21 07:05 systemd-private-tLzIhP
+drwx------. 3 root  root    16 Feb 21 07:05 systemd-private-Zx7gVA
+drwx------. 2 kiosk kiosk   23 Feb 21 07:06 ssh-aeISVxyM1Mq5
+drwx------. 3 root  root    16 Feb 21 07:06 systemd-private-vTORO3
+[kiosk@foundation0 ~]$
+
+``` 
+(但要注意, 个别情况下面,选项有顺序要求,与后面所接参数也有关系.)
+
+` /tmp` 为参数,往往是命令作用的目录, 像本例就是要对/tmp目录的文件按时间倒序的长格式排列.
+
+### RH124 P5的 practise需要演示一下
+
+#### shell
+就shell的概念可以解释地下, shell在英文字面是外壳的意思, 这个外壳是相对于内核(kernel)而言的
+
+我们看下面命令
+查看系统内核
+```bash
+[kiosk@foundation0 ~]$ uname -r
+3.10.0-229.el7.x86_64
+```
+平时我们用到的`ubuntu`,`redhad`,`suse`, `kali`, `arch`, `gentoo`等都是基于内核再加上一系列的外围软件,而成的发行版本.
+```bash
+[kiosk@foundation0 ~]$  cat /etc/redhat-release
+Red Hat Enterprise Linux Server release 7.1 (Maipo)
+```
+
+现在所用的shell就是bash
+```bash
+[kiosk@foundation0 ~]$ echo $SHELL
+/bin/bash
+```
+
+其中虚拟控制台与终端的概念我们接下来讲述.
 
 
+## 在桌面上运行命令行(Accessing the Command Line Using the Desktop)
 
+### Gnome
+
+>GNOME
+From Wikipedia, the free encyclopedia<br>
+GNOME (/(ɡ)noʊm/)[8][9] is a free and open-source desktop environment for Unix-like[10] operating systems.
+GNOME was originally an acronym for GNU Network Object Model Environment, but the acronym was dropped because it no longer reflected the vision of the GNOME project.[11]
+
+### 登陆演示
+由于VM默认用户kiosk默认是免密登陆的, 因此我们需要在foundation0 logout一下才能继续演下去.
+
+之后就是切换到点击用户名(kiosk),输入密码(redhat)(此处先略过实验环境的介绍),
+<br>
+还可以点击一下 sign in旁边的小齿轮去选择,gnome, gnome classic, custom 几种模式, 默认是相对简结的classic
+
+### 登陆成功后,演示界面各部分
+- 从左上角扫到右上角, 一一介绍即可.
+- 打开几个窗口, 之后可以像windows那样用alt+tab进行窗口之间的切换, 按super(win)键可以看到另外的样子.
+
+### 工作区的演示
+刚才按win键时, 大家可以看到右下角有几个差不多样子的窗口,那个就是工作区, (workspace1-4)
+据说现在windows10也加上了(我这个土人不太清楚,未用过)
+#### 切换工作区(alt+ctrl 加上下箭头)
+#### 把当前窗口移动到上(下)工作区(alt+ctrl 加上下箭头)
+
+
+### 在桌面空白处打开终端
+在桌面的空白处利用右键菜单可以打开终端, 又可以再愉快地键入命令行了...
+
+> 要强调一下, 考试也是用这个终端的所以这里也重点讲一下一些操作的小技巧
+
+- 按着(super+左箭头)之后可以向左靠边,或向右靠边,(同理向右), 也可以上下试试
+- 在终端中copy文字,(选择,后按中键)
+- 可以ctrl+shift+t可以在同一个终端中开多个tab,之后按alt+1,2,3,4..在各个窗中切换
+
+### 六个虚拟控制台
+- Ctrl+Alt+F1 图形控制台
+- Ctrl+Alt+F2 字符控制台
+- Ctrl+Alt+F3 字符控制台
+- Ctrl+Alt+F4 字符控制台
+- Ctrl+Alt+F5 字符控制台
+- Ctrl+Alt+F6 字符控制台
+
+### 演示关机
+### 通过桌面上的几个图标介绍后台的几个机器
+### 刚好打开了desktop后, 做RH124 P11的练习
+
+## 在bash shell中执行命令行(Executing Commands Using the Bash Shell)
+
+下面的命令行在putty(也就是通过window宿主机),这样比较方便从外面复制命令,利于加快学习速度
+<br>
+(因为vmware tools没有装, 不能在外面直接复制到foundation0中)
+
+### 查看shell
+之前我们说的shell是一个概念, 一个泛称,,落实具体就有既定的一个shell
+
+```bash
+[kiosk@foundation0 ~]$ echo $SHELL
+/bin/bash
+```
+bash是一个常用的shell, 我们考试环境也是用这个
+
+当然, 据说流行的shell还有一些
+![](res/sorts-of-shell.png)
+
+#### 用;把两个命令写在一行
+拿过才的hello world后打时间的例子, 有人会吐槽说,打的时间与写的hello world有一两秒的差别了.
+那么我们其实可以用;把两条独立的命令打在一行中, 让shell很一条接一条地串行解释.
+
+```bash
+
+[kiosk@foundation0 ~]$ echo 'hello world';date '+%Y%m%d %T'
+hello world
+20190221 08:11:48
+```
+
+#### linux不像windows那样都有文件扩展名
+在linux中的文件没有强制要求一定要带扩展名,也就是不一定要abc.cfg,所以刚切到linux时,可能会有点不适应.
+有一个相对较折中的方案, 就是用file去判断文件类型.而不是像windows那样, 一定的扩展名打开对应一定的程序.
+而linux有时如果是指定一个文件需要用某个特定的程序去打开, 可以用`Shebang`,
+也就是平时我们看到脚本第一行往往是`#!/bin/sh`,就是告诉你,
+ <br>
+ 这个文本文件, 可以用 /bin/sh这个文件去对该文件进行解释, 也算是一种关联吧.
+ 
+用file可以查看不同类似的文件, 
+````bash
+[kiosk@foundation0 ~]$ file /bin/ls
+/bin/ls: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked (uses shared libs), for GNU/Linux 2.6.32, BuildID[sha1]=0x7dc964034aa8ec7327b3992e3239a0f50789a3dd, stripped
+[kiosk@foundation0 ~]$ file /etc/passwd
+/etc/passwd: ASCII text
+````
+
+#### passwd
+该命令在上一个实例中就做过了, 暂时不重复
+
+#### head tail
+默认两个命令都是-n 10
+```bash
+[kiosk@foundation0 ~]$ head /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+bin:x:1:1:bin:/bin:/sbin/nologin
+daemon:x:2:2:daemon:/sbin:/sbin/nologin
+adm:x:3:4:adm:/var/adm:/sbin/nologin
+lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+sync:x:5:0:sync:/sbin:/bin/sync
+shutdown:x:6:0:shutdown:/sbin:/sbin/shutdown
+halt:x:7:0:halt:/sbin:/sbin/halt
+mail:x:8:12:mail:/var/spool/mail:/sbin/nologin
+operator:x:11:0:operator:/root:/sbin/nologin
+[kiosk@foundation0 ~]$ head -n /etc/passwd
+head: /etc/passwd: invalid number of lines
+[kiosk@foundation0 ~]$ head -n 10 /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+bin:x:1:1:bin:/bin:/sbin/nologin
+daemon:x:2:2:daemon:/sbin:/sbin/nologin
+adm:x:3:4:adm:/var/adm:/sbin/nologin
+lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+sync:x:5:0:sync:/sbin:/bin/sync
+shutdown:x:6:0:shutdown:/sbin:/sbin/shutdown
+halt:x:7:0:halt:/sbin:/sbin/halt
+mail:x:8:12:mail:/var/spool/mail:/sbin/nologin
+operator:x:11:0:operator:/root:/sbin/nologin
+[kiosk@foundation0 ~]$ head -n 10 /etc/passwd|wc
+     10      10     385
+[kiosk@foundation0 ~]$ head -n /etc/passwd|wc
+head: /etc/passwd: invalid number of lines
+      0       0       0
+[kiosk@foundation0 ~]$ head -n 10 /etc/passwd|wc
+     10      10     385
+[kiosk@foundation0 ~]$ head -n 10 /etc/passwd|wc -l
+10
+[kiosk@foundation0 ~]$ head /etc/passwd|wc -l
+10
+```
+
+tail 这个命令可以演示一下把一些字藏在一张图片中去...
+
+### 命令行加速三板斧
+
+#### 补全
+
+复习一下命令行组成的三部分,
+- 要运行的命令行
+- 选项
+- 参数
+
+据说前两项要以装了bash这个shell就可以补出来, 
+<br>
+而第三个参数的补全需要装下面这个软件才能实现, 但我们手上的系统好像装机后默认就装了
+
+```bash
+[kiosk@foundation0 ~]$ yum list|grep bash-comple
+bash-completion.noarch                 1:2.1-6.el7                 @anaconda/7.1
+```
+
+补全说明中, 如果能一个tab能补全的就补完了...如果一个tab不行?那么请输入两个tab,,,
+当然,如果你补充的项数很多, 可能会导致刷屏, 那么系统还是会很温馨地提示你,会比较多, 是不是要全显示
+```bash
+[kiosk@foundation0 ~]$ l
+Display all 143 possibilities? (y or n)
+```
+
+补全功能很好用, 有时习惯了之后, 执行忘子, 下意识地去找tab的....
+
+#### 历史命令
+- history可以查看之前键入过的命令, 查完后可以用!接序号去加快执行,
+- 当然,也可以用上下箭头去找上下的命令,(有时tty的设置会使这种办法失效)
+- 对于用!!重复上一条命令
+演于
+```bash
+k@t530:~/code$ ls
+c
+k@t530:~/code$ !!
+ls
+c
+```
+对于由于是普通用户执行了需要特权才能执行的命令, 可以用`sudo !!`
+```bash
+cat: /etc/shadow: Permission denied
+k@t530:~/code$ sudo !!
+sudo cat /etc/shadow
+[sudo] password for k: 
+daemon:*:17737:0:99999:7:::
+bin:*:17737:0:99999:7:::
+...
+gdm:*:17737:0:99999:7:::
+...
+libvirt-qemu:!:17942:0:99999:7:::
+libvirt-dnsmasq:!:17942:0:99999:7:::
+k@t530:~/code$ 
+```
+
+下面命令用于清理`history -c` 用以清理历史记录, 
+<br>
+以免一些密码信息外泄(如svn checkout出来时, 把密码写在了命令行中)
+
+#### 命令行间的快束操作
+
+##### emacs
+
+默认时emacs 的命令行编辑
+```bash
+[kiosk@foundation0 ~]$ set -o
+allexport       off
+braceexpand     on
+emacs           on
+errexit         off
+errtrace        off
+functrace       off
+hashall         on
+histexpand      on
+history         on
+ignoreeof       off
+interactive-comments    on
+keyword         off
+monitor         on
+noclobber       off
+noexec          off
+noglob          off
+nolog           off
+notify          off
+nounset         off
+onecmd          off
+physical        off
+pipefail        off
+posix           off
+privileged      off
+verbose         off
+vi              off
+xtrace          off
+```
+|combile key| action     |
+|-----------|:------------
+|ctrl + a |行头|
+|ctrl + e |行尾|
+|ctrl + f |右移|
+|ctrl + b |左移|
+|ctrl + u |删除光标到开头|
+|ctrl + k |删除光标到结尾|
+|ctrl + k |删除光标到结尾|
+|ctrl + r |搜索之前使用过的命令|
+|exit + . |复制上一个命令的最后一个参数<br>(这个我自己用得真心的不多, 有点偏,个人觉得)|
+|...|....|
+
+这些记快捷键的东西,有时肌内记忆比我们现在死记硬背好多了.
+
+##### vi
+我本人还是比较习惯用vi模式进行行编辑
+将在后面讲vi时再补充
+
+````bash
+set -o vi
+````
+
+##### 演示RH124 P17, P18的练习
+##### 演示RH124 P19,21的实验 
 
