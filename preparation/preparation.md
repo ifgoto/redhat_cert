@@ -71,9 +71,9 @@
 点击右上角时间旁边的图标
 ![](res/vmNetSetting01.png)
 ![](res/vmNetSetting02.png)
+![](res/vmNetSetting05.png)
 ![](res/vmNetSetting03.png)
 ![](res/vmNetSetting04.png)
-![](res/vmNetSetting05.png)
 
 ## 验证网络配置
 - `guest-->host`
