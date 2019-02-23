@@ -397,7 +397,7 @@ drwxrwxrwt. 12 root root 4096 Feb 23 22:41 /tmp
 
 ### RH124p161 solution可选来讲课
 
-# 午体
+# 午休
 
 # 4. 监控及管理windows进程
 
