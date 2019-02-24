@@ -45,7 +45,7 @@ student
 ```
 - 手上都在干啥活儿?
 ```bash
-[student@desktop0 ~]$ ps -au
+[student@desktop0 ~]$ ps au|grep ^`whoami`
 USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
 root       596  0.0  1.3 172156 25592 tty1     Ss+  11:03   0:06 /usr/bin/Xorg :0
 root      1580  0.0  0.0 110004   824 ttyS0    Ss+  11:03   0:00 /sbin/agetty --k
