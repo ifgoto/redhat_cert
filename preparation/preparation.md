@@ -134,7 +134,7 @@ Connection to 172.25.0.10 closed.
 ```
 这时点击看到的是字符界面
 ![](res/after-multi-user-reboot-tui.png)
-如果后期需要把字符界面切换回图型界面, 我们可以这样操作
+如果后期需要一开始就从字符界面切换回图型界面, 我们可以这样操作.
 
 ```bash
 [root@desktop0 ~]# systemctl get-default
@@ -146,6 +146,10 @@ ln -s '/usr/lib/systemd/system/graphical.target' '/etc/systemd/system/default.ta
 重启后是图型界面
 ![](res/after-graphcal-reboot-gui.png)
 
+
+#### 如果只是偶尔使用图型界面
+[20190925更新] 如果平时还是用字符界面,只是偶尔用到图型界面, 那么我们可以默认用字符界面,<br>
+ 当我们需要用到图型界面的时候,可以用`startx`这个命令去在字符界面中启动图型界面.
 
 # 教学环境介绍
 (看是否需要先略过, 暂时先略过)
