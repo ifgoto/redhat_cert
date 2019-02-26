@@ -526,4 +526,396 @@ MS Name/IP address         Stratum Poll Reach LastRx Last sample
 
 ```
 
+# 3. 网络管理
 
+## 基本概念
+
+### IPV4
+
+IP地址由32位二进制数组成，为便于使用，常以XXX.XXX.XXX.XXX形式表现，每组XXX代表小于或等于255的10进制数。
+<br>
+例如维基媒体的一个IP地址是208.80.152.2。地址可分为A、B、C、D、E五大类，其中E类属于特殊保留地址。
+IP地址是唯一的。当前IPv4技术可能使用的IP地址最多可有4,294,967,296个（即232）。<br>
+骤看可能觉得很难会用尽，但由于早期编码和分配上的问题，使很多区域的编码实际上被空出或不能使用。<br>
+加上互联网的普及，使大部分家庭都至少有一部计算机，连同公司的计算机，以及连接网络的各种设备都消耗大量IPv4地址资源。
+<br>
+随着互联网的快速成长，IPv4的42亿个地址的分配最终于2011年2月3日用尽.
+#### 网络分屋
+
+![](res/osi_tcp_ip_layer.png)
+
+此时可以就四个分层举一下各种分层有哪些应用,如ping的icmp在 网际互联层等.
+
+
+#### 分为网络部分,主机部分,
+
+### IP地址类型
+
+#### 公有地址
+
+公有地址（Public address）由Inter NIC（Internet Network Information Center因特网信息中心）负责。这些IP地址分配给注册并向Inter NIC提出申请的组织机构。通过它直接访问因特网。
+
+#### 私有地址
+
+私有地址（Private address）属于非注册地址，专门为组织机构内部使用。
+
+以下列出留用的内部私有地址
+
+A类 10.0.0.0--10.255.255.255
+B类 172.16.0.0--172.31.255.255
+C类 192.168.0.0--192.168.255.255
+
+### IP地址分类
+最初设计互联网络时，为了便于寻址以及层次化构造网络，每个IP地址包括两个标识码（ID），即网络ID和主机ID。同一个物理网络上的所有主机都使用同一个网络ID，网络上的一个主机（包括网络上工作站，服务器和路由器等）有一个主机ID与其对应。Internet委员会定义了5种IP地址类型以适合不同容量的网络，即A类~E类。
+其中A、B、C3类（如下表格）由InternetNIC在全球范围内统一分配，D、E类为特殊地址。
+
+|类别|最大网络数| IP地址范围| 单个网段最大主机数| 私有IP地址范围 |
+|---|----|----|---|----|
+|A| 126（2^7-2)| 1.0.0.0-127.255.255.255| 16777214| 10.0.0.0-10.255.255.255|
+|B| 16384(2^14)| 128.0.0.0-191.255.255.255| 65534| 172.16.0.0-172.31.255.255|
+|C| 2097152(2^21)| 192.0.0.0-223.255.255.255| 254| 192.168.0.0-192.168.255.255|
+
+#### A类IP地址<br>
+
+一个A类IP地址是指， 在IP地址的四段号码中，第一段号码为网络号码，剩下的三段号码为本地计算机的号码。如果用二进制表示IP地址的话，A类IP地址就由1字节的网络地址和3字节主机地址组成，网络地址的最高位必须是“0”。A类IP地址中网络的标识长度为8位，主机标识的长度为24位，A类网络地址数量较少，有126个网络，每个网络可以容纳主机数达1600多万台。<br>
+A类IP地址 地址范围1.0.0.0到127.255.255.255   （二进制表示为：00000001 00000000 00000000 00000000 - 01111111 11111111 11111111 11111111）。最后一个是广播地址。<br>
+A类IP地址的子网掩码为255.0.0.0，每个网络支持的最大主机数为256的3次方-2=16777214台。<br>
+ 
+ 
+#### B类IP地址<br>
+一个B类IP地址是指，在IP地址的四段号码中，前两段号码为网络号码。如果用二进制表示IP地址的话，B类IP地址就由2字节的网络地址和2字节主机地址组成，网络地址的最高位必须是“10”。B类IP地址中网络的标识长度为16位，主机标识的长度为16位，B类网络地址适用于中等规模的网络，有16384个网络，每个网络所能容纳的计算机数为6万多台。<br>
+B类IP地址地址范围128.0.0.0-191.255.255.255   （二进制表示为：10000000 00000000 00000000 00000000----10111111 11111111 11111111 11111111）。 最后一个是广播地址。<br>
+B类IP地址的子网掩码为255.255.0.0，每个网络支持的最大主机数为256的2次方-2=65534台。<br>
+
+#### C类IP地址<br>
+一个C类IP地址是指，在IP地址的四段号码中，前三段号码为网络号码，剩下的一段号码为本地计算机的号码。如果用二进制表示IP地址的话，C类IP地址就由3字节的网络地址和1字节主机地址组成，网络地址的最高位必须是“110”。C类IP地址中网络的标识长度为24位，主机标识的长度为8位，C类网络地址数量较多，有209万余个网络。适用于小规模的局域网络，每个网络最多只能包含254台计算机。
+C类IP地址范围192.0.0.0-223.255.255.255   （二进制表示为: 11000000 00000000 00000000 00000000 - 11011111 11111111 11111111 11111111）。
+C类IP地址的子网掩码为255.255.255.0，每个网络支持的最大主机数为256-2=254台<br>
+
+#### D类IP地址
+D类IP地址在历史上被叫做多播地址(multicast address)，即组播地址。在以太网中，多播地址命名了一组应该在这个网络中应用接收到一个分组的站点。多播地址的最高位必须是“1110”，范围从224.0.0.0到239.255.255.255。<br>
+
+
+## 与我们的环境搭建时,结合讲解
+可以进一下vm的几种网络方式, 其中有仅主机(我们一开始的环境建议, 另外我把机器桥接后,大家也可以访问了, 另外需要上外网的话可以nat)
+
+
+### DHCP 与IP冲突
+
+### MAC冲突
+
+### 网络接口的更新
+除了传统的 eth0, wlan0外,还有一系列新规则
+可以结合课本讲解, 并且在虚拟机中演示.
+
+## 配置网络
+
+### ifconfig
+
+显示ip地址
+
+之前用ifconfig 显示, 
+```bash
+[student@desktop0 ~]$ ifconfig
+eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 172.25.0.10  netmask 255.255.255.0  broadcast 172.25.0.255
+        inet6 fe80::5054:ff:fe00:a  prefixlen 64  scopeid 0x20<link>
+        ether 52:54:00:00:00:0a  txqueuelen 1000  (Ethernet)
+        RX packets 652  bytes 77967 (76.1 KiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 465  bytes 114583 (111.8 KiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10<host>
+        loop  txqueuelen 0  (Local Loopback)
+        RX packets 12  bytes 976 (976.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 12  bytes 976 (976.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+```
+另外也可以用命令
+```bash
+[student@desktop0 ~]$ ifconfig eth0 172.25.0.9 netmask 255.255.255.0
+```
+临时更改IP,但重启后失效
+
+现在新的系统可以建议用
+
+### ip addr
+
+显示ip
+```bash
+[student@desktop0 ~]$ ip addr
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host
+       valid_lft forever preferred_lft forever
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP qlen 1000
+    link/ether 52:54:00:00:00:0a brd ff:ff:ff:ff:ff:ff
+    inet 172.25.0.10/24 brd 172.25.0.255 scope global dynamic eth0
+       valid_lft 20300sec preferred_lft 20300sec
+    inet6 fe80::5054:ff:fe00:a/64 scope link
+       valid_lft forever preferred_lft forever
+```
+
+### 显示统计信息
+```bash
+[student@desktop0 ~]$ ip -s link  show eth0
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP mode DEFAULT qlen 1000
+    link/ether 52:54:00:00:00:0a brd ff:ff:ff:ff:ff:ff
+    RX: bytes  packets  errors  dropped overrun mcast
+    94797      853      0       0       0       0
+    TX: bytes  packets  errors  dropped carrier collsns
+    127635     571      0       0       0       0
+```
+
+### 看路由信息 
+
+```bash
+[student@desktop0 ~]$ ip route
+default via 172.25.0.254 dev eth0  proto static  metric 1024
+172.25.0.0/24 dev eth0  proto kernel  scope link  src 172.25.0.10
+172.25.253.254 via 172.25.0.254 dev eth0  proto static  metric 1
+```
+
+此时这个命令可以结合书rh124P266中分别走eth0,eth1的两种IP不同的走向.
+
+### ping 测试连通性
+-c 3只ping三次
+```bash
+[student@desktop0 ~]$ ping -c 3 172.25.0.11
+PING 172.25.0.11 (172.25.0.11) 56(84) bytes of data.
+64 bytes from 172.25.0.11: icmp_seq=1 ttl=64 time=1.52 ms
+64 bytes from 172.25.0.11: icmp_seq=2 ttl=64 time=1.23 ms
+64 bytes from 172.25.0.11: icmp_seq=3 ttl=64 time=1.19 ms
+
+--- 172.25.0.11 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2005ms
+rtt min/avg/max/mdev = 1.199/1.320/1.526/0.149 ms
+```
+
+### tracepath traceroute
+
+查看到一个地方,要经历哪些地方
+
+````bash
+[student@desktop0 ~]$ traceroute classroom.example.com
+traceroute to classroom.example.com (172.25.254.254), 30 hops max, 60 byte packets
+ 1  classroom.example.com (172.25.254.254)  1.232 ms !X  0.860 ms !X  0.939 ms !X
+[student@desktop0 ~]$ tracepath classroom.example.com
+ 1:  classroom.example.com                                 1.888ms !H
+     Resume: pmtu 65535
+
+````
+
+在windows下也有类似的
+```bash
+C:\Users\z88>tracert www.baidu.com
+
+通过最多 30 个跃点跟踪
+到 www.a.shifen.com [14.215.177.39] 的路由:
+
+  1     2 ms     8 ms     2 ms  XiaoQiang [192.168.31.1]
+  2     3 ms     7 ms     1 ms  REALTEK [192.168.1.1]
+  3    67 ms    13 ms     *     100.64.0.1
+  4     9 ms     6 ms    27 ms  113.98.93.121
+  5     7 ms    14 ms     *     183.56.34.53
+  6    15 ms    14 ms    21 ms  113.96.4.130
+  7    11 ms    13 ms    11 ms  86.96.135.219.broad.fs.gd.dynamic.163data.com.cn [219.135.96.86]
+  8    27 ms    10 ms    26 ms  14.29.121.178
+  9     *        *        *     请求超时。
+ 10    10 ms    15 ms    12 ms  14.215.177.39
+
+跟踪完成。
+```
+
+### 故障排查及服务处理
+
+[常用端口](https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers)
+<br>
+[0-1023] 为Well-Known ports
+1024+ Registered ports
+
+`/etc/services` 列出了一些常用端口分别是哪些服务所占用, 平时我们打开为我们自己的程序启用端口时, 要注意.
+
+
+
+<br>
+ss 命令可以查看当前端口占用状态,当然也可以用netstat,但不确认netstat都安装了. 据说ss都安了
+ 
+```bash
+[student@desktop0 ~]$ ss -ta
+State      Recv-Q Send-Q                                                 Local Address:Port                                                     Peer Address:Port
+LISTEN     0      100                                                        127.0.0.1:smtp                                                                *:*
+LISTEN     0      128                                                                *:sunrpc                                                              *:*
+LISTEN     0      128                                                                *:ssh                                                                 *:*
+LISTEN     0      128                                                                *:48246                                                               *:*
+ESTAB      0      0                                                        172.25.0.10:ssh                                                      172.25.0.250:33561
+LISTEN     0      100                                                              ::1:smtp                                                               :::*
+LISTEN     0      128                                                               :::33887                                                              :::*
+LISTEN     0      128                                                               :::sunrpc                                                             :::*
+LISTEN     0      128                                                               :::ssh                                                                :::*
+```
+
+![](res/SsAndNetstat'sOption.png)
+
+另外,也还可以参考
+[Red Hat Enterprise Linux Networking Guide for Red Hat Enterprise Linux 7](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/pdf/networking_guide/Red_Hat_Enterprise_Linux-7-Networking_Guide-en-US.pdf)
+
+### 大家可以做RH124P249练习(检查风络配置)
+
+## 用nmcli 配置网络
+
+### 列出一系列配置网络的方法
+
+- gnome的图型界面的networking manager
+- nm-connection-editor (需要gui)
+- nmtui
+- 直接 修改/etc/sysconfig/network-scripts/下面的相关文件 |考试建议(ipv4部分)
+- nmcli
+
+
+#### nmcli
+
+![](res/nmcli_summary.png)
+- nmcli的一系列操作, 可以照书上进行操作
+-  man nm-settings
+
+
+## 编辑相应配置文件修改IP
+
+`/etc/sysconfig/network-scripts/ifcfg-<name>,
+`
+
+![](res/ifcfg-name.png)
+
+修改完后,需要relad,down,up
+````bash
+Error: Object 'reload' is unknown, try 'nmcli help'.
+[root@desktop0 ~]# nmcli con reload
+[root@desktop0 ~]# nmcli con down "System eth0"
+[root@desktop0 ~]# nmcli con up "System eth0"
+````
+注意, 如果在ssh进行此操作, down后,装会自动断开, 请在虚拟机上打开终端进行相关up的操作.
+
+
+## 主机名及名字解释
+
+`hostname XXXX ` 可以临时修改主机名, 但不会写相应的配置文件, 因此重启后会失效, 
+`hostnamectrl set-hostname XXXX ` 修改会写文件, 重启后还是会生效.
+
+### 配置文件
+
+/etc/hosts
+<br>
+man hosts
+可以支持长短格式.
+
+````bash
+nmcli con mod ID +ipv4.dns IP
+````
+可以修改DNS
+其中ID为`nmcli con show`中显示的NAME, 如"System eth0"
+
+
+如果能在/etc/hosts中匹配, 就完成, 否则还要找
+``/etc/resolv.conf``
+
+```bash
+[root@desktop0 network-scripts]# cat /etc/resolv.conf
+# Generated by NetworkManager
+domain example.com
+search example.com
+nameserver 172.25.254.254
+```
+
+## 归档文件,并在系统间复制
+
+### tar
+#### 打包
+严格来说, 这个只是个打包的程序, 也就是把file1,file2,file3等合并到一个file文件中, 这个file文件并没有比file1+file2+file3的大小变小.
+
+#### 压缩
+- z (gzip)
+- j (bzip2)
+- J (xz)
+
+-v 详细模式
+
+```bash
+[root@desktop0 ~]# time tar cf etc.tar /etc
+tar: Removing leading `/' from member names
+
+real    0m0.111s
+user    0m0.014s
+sys     0m0.094s
+[root@desktop0 ~]# time tar czf etc.tar.gz /etc
+tar: Removing leading `/' from member names
+
+real    0m1.067s
+user    0m0.992s
+sys     0m0.056s
+[root@desktop0 ~]# time tar cjf etc.tar.bz2 /etc
+tar: Removing leading `/' from member names
+
+real    0m2.812s
+user    0m2.745s
+sys     0m0.052s
+[root@desktop0 ~]# time tar cJf etc.tar.xz /etc
+tar: Removing leading `/' from member names
+
+real    0m13.594s
+user    0m13.452s
+sys     0m0.103s
+[root@desktop0 ~]# ls -lrth etc*
+-rw-r--r--. 1 root root  30M Feb 27 00:57 etc.tar
+-rw-r--r--. 1 root root 8.4M Feb 27 00:57 etc.tar.gz
+-rw-r--r--. 1 root root 7.0M Feb 27 00:57 etc.tar.bz2
+-rw-r--r--. 1 root root 5.7M Feb 27 00:57 etc.tar.xz
+
+```
+xz压缩得最小, 但所用时间也最久.
+
+
+-t可以查看 ,如有v的话有点像ls的-l长格式
+
+```bash
+[root@desktop0 ~]# tar -tvf etc.tar.gz|head -n 5
+drwxr-xr-x root/root         0 2019-02-27 00:20 etc/
+-rw-r--r-- root/root       313 2014-05-07 09:22 etc/fstab
+-rw------- root/root         0 2014-05-07 09:22 etc/crypttab
+lrwxrwxrwx root/root         0 2014-05-07 09:22 etc/mtab -> /proc/self/mounts
+drwxr-xr-x root/root         0 2014-05-07 09:27 etc/pki/
+[root@desktop0 ~]# tar -tf etc.tar.gz|head -n 5
+etc/
+etc/fstab
+etc/crypttab
+etc/mtab
+etc/pki/
+```
+
+-xf 可以统一用来解压 (gz,bz2,xz会智能识别)
+
+还要可以加入-p参数让权限解压后再压缩前一样
+
+-C 可以在打包时排除一些目录
+
+## scp, sftp
+
+scp 与cp很像, 就只是通过ssh来进行文件cp, 对于目录也一样要加-r
+
+sftp
+注意与ftps不一样, 后者是ftp的基础上再加密了(+ssl)
+
+get到本地,
+
+put到他地.
+
+#rsync 
+
+-av 这两个参数经常一起用
+命令用来同步两个目录
