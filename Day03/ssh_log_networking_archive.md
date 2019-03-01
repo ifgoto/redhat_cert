@@ -442,6 +442,20 @@ system.journal
 
 ```
 
+### 结合例子教学
+如在/etc/ssh/sshd_config中某一个选项的yes改成yess(故意多加入一个s),再 `systemctl restart sshd```, 
+
+<br>
+
+此时可以用 `systemctl status sshd`
+
+<br>
+
+或 `/var/log/message`
+或 `journalctl -n `
+都可以看到说相关行有一个不明的选项yess不能正确解释导致sshd服务重启失败.
+
+
 ### 保存精确的时间
 
 #### 设置本地时间及时区
