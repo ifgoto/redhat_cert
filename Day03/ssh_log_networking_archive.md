@@ -238,8 +238,18 @@ Now try logging into the machine, with:   "ssh 'student@172.25.0.11'"
 and check to make sure that only the key(s) you wanted were added.
 ```
 
-
 之后就可以免密登陆了
+如果输入了密钥保护密码,那么需要用在开始的时候,输入
+```
+[kiosk@foundation0 ~]$ ssh-agent bash
+[kiosk@foundation0 ~]$ ssh-add
+Enter passphrase for /home/kiosk/.ssh/id_rsa:
+Identity added: /home/kiosk/.ssh/id_rsa (/home/kiosk/.ssh/id_rsa)
+```
+
+这样去免密输入
+
+
 ```bash
 [student@desktop0 ~]$ ssh student@172.25.0.11
 Last login: Mon Feb 25 23:41:57 2019 from desktop0.example.com
@@ -298,6 +308,14 @@ Permission denied (publickey,gssapi-keyex,gssapi-with-mic).
 同理, 修改了
 PermitRootLogin no
 就会让root不能直接ssh登陆.
+
+## 1.4 [初见,工作原理,实践](https://www.jianshu.com/p/33461b619d53)
+
+## 1.5 ssh端口转发
+
+[ssh端口转发](https://blog.fundebug.com/2017/04/24/ssh-port-forwarding/)
+# 在本地主机A1登陆远程云主机B1，并进行本地端口转发。2000端口绑定本地所有网卡
+ssh -L 2000:localhost:3000 root@103.59.22.17
 
 
 
@@ -699,6 +717,7 @@ default via 172.25.0.254 dev eth0  proto static  metric 1024
 此时这个命令可以结合书rh124P266中分别走eth0,eth1的两种IP不同的走向.
 
 ### ping 测试连通性
+此时注意区别, linux下的ping是不断ping的, 而windows只会ping4次, 如果默认不设置
 -c 3只ping三次
 ```bash
 [student@desktop0 ~]$ ping -c 3 172.25.0.11
@@ -784,6 +803,8 @@ LISTEN     0      128                                                           
 
 ## 用nmcli 配置网络
 
+这个对network manager 这个服务有依赖,必须启动network manager才能使用nmcli
+
 ### 列出一系列配置网络的方法
 
 - gnome的图型界面的networking manager
@@ -804,6 +825,8 @@ LISTEN     0      128                                                           
 
 `/etc/sysconfig/network-scripts/ifcfg-<name>,
 `
+
+注意, 不建议DNS也在这个文件中配置, 不然每次修改DNS的时候, 也要网卡down,up也要停网, 只放在/etc/resolv.conf
 
 ![](res/ifcfg-name.png)
 
