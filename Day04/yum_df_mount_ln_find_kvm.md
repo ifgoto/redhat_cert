@@ -35,6 +35,26 @@ RPM 软件包文件名称组合: name-version-release.architecture
 
 ### gpg (gnu private guard) 保证你获得的软件包是合法,正版流出的,(数字签名)
 
+[gpg demo](http://www.ruanyifeng.com/blog/2013/07/gpg.html)
+
+其中可以用
+在有了gpg keys的情况下(生成很久...很麻烦)
+```bash
+gpg --clearsign notic
+
+```
+生成notic.asc后
+再用
+```bash
+gpg --verify notic.asc
+
+```
+可以进到notic.asc中的数据中进行修改哪怕是一个字, 也能发现不同了.
+此时可以结合md5sum进行讲解
+
+
+
+
 >[root@server0 ~]# rpm -ivh vsftpd-3.0.2-9.el7.x86_64.rpm
 >warning: vsftpd-3.0.2-9.el7.x86_64.rpm: Header V3 RSA/SHA256 Signature, key ID fd431d51: NOKEY
 >Preparing...                          ################################# [100%]
@@ -99,7 +119,7 @@ RPM 软件包文件名称组合: name-version-release.architecture
 >查询所有安装的包
 >[root@server0 ~]# rpm –qa
 >
->查询软件包相关信息
+>查询软件包相关信息(如果未安装, 真接查文件,需要写全名)
 >[root@server0 ~]# rpm -qi openssh-server
 >Name        : openssh-server
 >Version     : 6.4p1
@@ -138,6 +158,9 @@ Preparing...                          ################################# [100%]
 Updating / installing...
    1:vsftpd-3.0.2-9.el7               ################################# [100%]
 [root@server0 ~]#
+
+
+ rpm -q --changelog httpd|less
 
 ### 不安装某个rpm包,但取出其中部分内容
 
@@ -675,3 +698,7 @@ ln -s
 
 剩下一系列可按书本上演示
 
+
+## 总复习
+ch16   的总复习键入的是
+`lab sa1-review setup`  注意是数字1而不是字母l

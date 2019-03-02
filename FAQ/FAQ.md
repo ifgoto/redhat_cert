@@ -38,3 +38,7 @@ rht-vmctl status classroom
 >  2019/3/1 22:01:07
 >如果还不行,,那我再想想其它办法
 
+## 总复习的字母不清
+ch16   的总复习键入的是
+`lab sa1-review setup`  注意是数字1而不是字母l
+
