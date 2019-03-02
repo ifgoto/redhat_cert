@@ -19,101 +19,101 @@ RPM 软件包文件名称组合: name-version-release.architecture
 
 但有一个不好的地方, 就是不自动解决依赖问题.
 
-[root@server0 ~]# rpm -ivh vsftpd-3.0.2-9.el7.x86_64.rpm
-warning: vsftpd-3.0.2-9.el7.x86_64.rpm: Header V3 RSA/SHA256 Signature, key ID fd431d51: NOKEY
-Preparing...                          ################################# [100%]
-Updating / installing...
-   1:vsftpd-3.0.2-9.el7               ################################# [100%]
-[root@server0 ~]#	
-升级 -Uvh
-	卸载 -e
-	校验 –V
-[root@server0 ~]# rpm -V openssh-server
-SM5....T.  c /etc/ssh/sshd_config
-	查询
-查软件是否安装
-[root@server0 ~]# rpm -q openssh-server
-openssh-server-6.4p1-8.el7.x86_64
-[root@server0 ~]#
-[root@server0 ~]#
-[root@server0 ~]# rpm -q httpd
-package httpd is not installed
-
-查软件安装了哪些文件
-[root@server0 ~]# rpm -ql openssh-server
-/etc/pam.d/sshd
-/etc/ssh/sshd_config
-/etc/sysconfig/sshd
-/usr/lib/systemd/system/sshd-keygen.service
-/usr/lib/systemd/system/sshd.service
-/usr/lib/systemd/system/sshd.socket
-/usr/lib/systemd/system/sshd@.service
-/usr/lib64/fipscheck/sshd.hmac
-/usr/libexec/openssh/sftp-server
-/usr/sbin/sshd
-/usr/sbin/sshd-keygen
-/usr/share/man/man5/moduli.5.gz
-/usr/share/man/man5/sshd_config.5.gz
-/usr/share/man/man8/sftp-server.8.gz
-/usr/share/man/man8/sshd.8.gz
-/var/empty/sshd
-
-查询配置文件
-[root@server0 ~]# rpm -qc openssh-server
-/etc/pam.d/sshd
-/etc/ssh/sshd_config
-/etc/sysconfig/sshd
-[root@server0 ~]#
-
-查询文档
-[root@server0 ~]# rpm -qd openssh-server
-/usr/share/man/man5/moduli.5.gz
-/usr/share/man/man5/sshd_config.5.gz
-/usr/share/man/man8/sftp-server.8.gz
-/usr/share/man/man8/sshd.8.gz
-
-查询命令属于哪个软件包
-[root@server0 ~]# which ifconfig
-/usr/sbin/ifconfig
-[root@server0 ~]#
-[root@server0 ~]# rpm -qf /usr/sbin/ifconfig
-net-tools-2.0-0.17.20131004git.el7.x86_64
-[root@server0 ~]#
-
-查询所有安装的包
-[root@server0 ~]# rpm –qa
-
-查询软件包相关信息
-[root@server0 ~]# rpm -qi openssh-server
-Name        : openssh-server
-Version     : 6.4p1
-Release     : 8.el7
-Architecture: x86_64
-Install Date: Wed 07 May 2014 09:25:31 AM CST
-Group       : System Environment/Daemons
-Size        : 756312
-License     : BSD
-Signature   : RSA/SHA256, Thu 03 Apr 2014 01:07:17 AM CST, Key ID 199e2f91fd431d51
-Source RPM  : openssh-6.4p1-8.el7.src.rpm
-Build Date  : Thu 20 Mar 2014 04:50:12 AM CST
-Build Host  : x86-017.build.eng.bos.redhat.com
-Relocations : (not relocatable)
-Packager    : Red Hat, Inc. <http://bugzilla.redhat.com/bugzilla>
-Vendor      : Red Hat, Inc.
-URL         : http://www.openssh.com/portable.html
-Summary     : An open source SSH server daemon
-Description :
-OpenSSH is a free version of SSH (Secure SHell), a program for logging
-into and executing commands on a remote machine. This package contains
-the secure shell daemon (sshd). The sshd daemon allows SSH clients to
-securely connect to your SSH server.
-
-没有安装的软件包查询：-p
-[root@server0 ~]# rpm -qpi vsftpd-3.0.2-9.el7.x86_64.rpm
-[root@server0 ~]# rpm -qpl vsftpd-3.0.2-9.el7.x86_64.rpm
-[root@server0 ~]# rpm -qpc vsftpd-3.0.2-9.el7.x86_64.rpm
-
-（3）RPM签名验证
+>[root@server0 ~]# rpm -ivh vsftpd-3.0.2-9.el7.x86_64.rpm
+>warning: vsftpd-3.0.2-9.el7.x86_64.rpm: Header V3 RSA/SHA256 Signature, key ID fd431d51: NOKEY
+>Preparing...                          ################################# [100%]
+>Updating / installing...
+>   1:vsftpd-3.0.2-9.el7               ################################# [100%]
+>[root@server0 ~]#	
+>升级 -Uvh
+>	卸载 -e
+>	校验 –V
+>[root@server0 ~]# rpm -V openssh-server
+>SM5....T.  c /etc/ssh/sshd_config
+>	查询
+>查软件是否安装
+>[root@server0 ~]# rpm -q openssh-server
+>openssh-server-6.4p1-8.el7.x86_64
+>[root@server0 ~]#
+>[root@server0 ~]#
+>[root@server0 ~]# rpm -q httpd
+>package httpd is not installed
+>
+>查软件安装了哪些文件
+>[root@server0 ~]# rpm -ql openssh-server
+>/etc/pam.d/sshd
+>/etc/ssh/sshd_config
+>/etc/sysconfig/sshd
+>/usr/lib/systemd/system/sshd-keygen.service
+>/usr/lib/systemd/system/sshd.service
+>/usr/lib/systemd/system/sshd.socket
+>/usr/lib/systemd/system/sshd@.service
+>/usr/lib64/fipscheck/sshd.hmac
+>/usr/libexec/openssh/sftp-server
+>/usr/sbin/sshd
+>/usr/sbin/sshd-keygen
+>/usr/share/man/man5/moduli.5.gz
+>/usr/share/man/man5/sshd_config.5.gz
+>/usr/share/man/man8/sftp-server.8.gz
+>/usr/share/man/man8/sshd.8.gz
+>/var/empty/sshd
+>
+>查询配置文件
+>[root@server0 ~]# rpm -qc openssh-server
+>/etc/pam.d/sshd
+>/etc/ssh/sshd_config
+>/etc/sysconfig/sshd
+>[root@server0 ~]#
+>
+>查询文档
+>[root@server0 ~]# rpm -qd openssh-server
+>/usr/share/man/man5/moduli.5.gz
+>/usr/share/man/man5/sshd_config.5.gz
+>/usr/share/man/man8/sftp-server.8.gz
+>/usr/share/man/man8/sshd.8.gz
+>
+>查询命令属于哪个软件包
+>[root@server0 ~]# which ifconfig
+>/usr/sbin/ifconfig
+>[root@server0 ~]#
+>[root@server0 ~]# rpm -qf /usr/sbin/ifconfig
+>net-tools-2.0-0.17.20131004git.el7.x86_64
+>[root@server0 ~]#
+>
+>查询所有安装的包
+>[root@server0 ~]# rpm –qa
+>
+>查询软件包相关信息
+>[root@server0 ~]# rpm -qi openssh-server
+>Name        : openssh-server
+>Version     : 6.4p1
+>Release     : 8.el7
+>Architecture: x86_64
+>Install Date: Wed 07 May 2014 09:25:31 AM CST
+>Group       : System Environment/Daemons
+>Size        : 756312
+>License     : BSD
+>Signature   : RSA/SHA256, Thu 03 Apr 2014 01:07:17 AM CST, Key ID 199e2f91fd431d51
+>Source RPM  : openssh-6.4p1-8.el7.src.rpm
+>Build Date  : Thu 20 Mar 2014 04:50:12 AM CST
+>Build Host  : x86-017.build.eng.bos.redhat.com
+>Relocations : (not relocatable)
+>Packager    : Red Hat, Inc. <http://bugzilla.redhat.com/bugzilla>
+>Vendor      : Red Hat, Inc.
+>URL         : http://www.openssh.com/portable.html
+>Summary     : An open source SSH server daemon
+>Description :
+>OpenSSH is a free version of SSH (Secure SHell), a program for logging
+>into and executing commands on a remote machine. This package contains
+>the secure shell daemon (sshd). The sshd daemon allows SSH clients to
+>securely connect to your SSH server.
+>
+>没有安装的软件包查询：-p
+>[root@server0 ~]# rpm -qpi vsftpd-3.0.2-9.el7.x86_64.rpm
+>[root@server0 ~]# rpm -qpl vsftpd-3.0.2-9.el7.x86_64.rpm
+>[root@server0 ~]# rpm -qpc vsftpd-3.0.2-9.el7.x86_64.rpm
+>
+>（3）RPM签名验证
 红帽提供的软件包都被红帽的私钥签名，为了安全起见，使用红帽的公钥验证软件包是否来自于红帽。
 [root@server0 ~]# rpm --import RPM-GPG-KEY-redhat-release
 [root@server0 ~]#
