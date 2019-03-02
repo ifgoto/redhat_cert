@@ -322,6 +322,9 @@ ssh -L 2000:localhost:3000 root@103.59.22.17
 # 2. 分析,存储日志
 
 ## 系统日志架构
+rhel 5 syslog kernel log
+rhel 6 rsyslog
+rhel 7 systemd journald
 
 各种系统日志
 ![](res/overview_of_system_log_files.png)
@@ -799,7 +802,7 @@ LISTEN     0      128                                                           
 另外,也还可以参考
 [Red Hat Enterprise Linux Networking Guide for Red Hat Enterprise Linux 7](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/pdf/networking_guide/Red_Hat_Enterprise_Linux-7-Networking_Guide-en-US.pdf)
 
-### 大家可以做RH124P249练习(检查风络配置)
+### 大家可以做RH124P249练习(检查网络配置)
 
 ## 用nmcli 配置网络
 

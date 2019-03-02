@@ -6,18 +6,34 @@ plan
 
 # 1. 安装和更新软件包
 
-第一小节先略过(考试不考, 平时也不怎用....)
+## 红帽订阅管理
+()第一小节先略过(考试不考, 平时也不怎用....))
+这一章是很重要的,因为我们开启服务,如果能装也装不上,那何谈配置与调优...
+
+红帽卖的技术服务.
+某个软件有bug,有漏洞,,,redhat会主导及时更新及推送..
+
+就算买了订阅服务,也可以装开源的.因为毕竟linux是开源的.
+
+
 
 ## RPM
+
+Redhat Package Management
+
 [rpm_wiki](https://en.wikipedia.org/wiki/RPM_Package_Manager)
 
-
+二进次包,大部分已配置好, 而不像源码中configure时要进行一系列的配置, 对运维的经验有较高的要求.
 
 一开始是红帽自己的软件发行打包方式, 后来多个其它系统也用到这个包管理系统.AIX,等
 
 RPM 软件包文件名称组合: name-version-release.architecture
 
 但有一个不好的地方, 就是不自动解决依赖问题.
+
+
+
+### gpg (gnu private guard) 保证你获得的软件包是合法,正版流出的,(数字签名)
 
 >[root@server0 ~]# rpm -ivh vsftpd-3.0.2-9.el7.x86_64.rpm
 >warning: vsftpd-3.0.2-9.el7.x86_64.rpm: Header V3 RSA/SHA256 Signature, key ID fd431d51: NOKEY
