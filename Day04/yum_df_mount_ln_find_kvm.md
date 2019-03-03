@@ -707,7 +707,22 @@ ln -s
 
 剩下一系列可按书本上演示
 
+可以说一下find -exec
+
+# 虚拟化
+
+## 虚扩化是云计算的基础
+
+## kvm
+
+增加硬件资源的利用率.
+ESX Hv Kvm fullv
+Xen    pv
+
+
 
 ## 总复习
 ch16   的总复习键入的是
 `lab sa1-review setup`  注意是数字1而不是字母l
+
+
