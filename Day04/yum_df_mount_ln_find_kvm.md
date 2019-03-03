@@ -510,6 +510,11 @@ Installed:
 Complete!
 
 ```
+repo alphat bet seq
+ local install
+ clear all
+
+
 ## 命令汇总
 ![](res/yum_commands.png)
 
@@ -599,7 +604,11 @@ tmpfs             942660       0    942660   0% /sys/fs/cgroup
 56      /root
 
 ```
-
+平时比较常用<br>
+也可以接着排个序
+```bash
+du -sm * |sort -rn|head -n 10
+```
 
 ## 挂载和卸载文件系统
 
