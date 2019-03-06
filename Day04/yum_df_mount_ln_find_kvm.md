@@ -522,6 +522,10 @@ repo alphat bet seq
 发现如果有时包名较长,可以先用
 yum makecache 先把名字相关的东西缓存到本地, 那样就可以实现补全,打起长包名来就轻松一点
 
+<br>
+另外这个cache好像与用户相关的, <br>
+也就是我student makecache后,root好像不能直接用. 自己也要makecache后才能用
+
 ### 当发现一些安装时, 默名其妙的错误,可以考虑yum clean把缓存清了(有时这个更新不够及时)
 
 ## 命令汇总
