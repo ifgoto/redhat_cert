@@ -177,6 +177,8 @@ rpm2cpio wonderwidgets - 1.0-4.x86_6.rpm|cpio -id "*txt"
 ## yum
 
 较好解决依赖问题
+
+
 ### 列出资源
 
 ```bash
@@ -331,6 +333,8 @@ Linux desktop0.example.com 3.10.0-123.el7.x86_64 #1 SMP Mon May 5 11:16:57 EDT 2
 ```
 
 ### remove
+
+(或者有时发现一些很)
 ```bash
 [root@desktop0 ~]# yum install httpd
 Loaded plugins: langpacks
@@ -514,6 +518,11 @@ repo alphat bet seq
  local install
  clear all
 
+### 补全tips:
+发现如果有时包名较长,可以先用
+yum makecache 先把名字相关的东西缓存到本地, 那样就可以实现补全,打起长包名来就轻松一点
+
+### 当发现一些安装时, 默名其妙的错误,可以考虑yum clean把缓存清了(有时这个更新不够及时)
 
 ## 命令汇总
 ![](res/yum_commands.png)
