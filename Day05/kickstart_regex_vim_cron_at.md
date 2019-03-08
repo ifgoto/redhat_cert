@@ -23,6 +23,16 @@ plan
 
 `get -e 'cat' -e 'dog' file`同时看猫狗
 
+## grep 相关命令
+为什么有颜色,
+```bash
+
+[student@server0 ~]$ alias grep
+alias grep='grep --color=auto'
+
+```
+
+
 
 其余部分 
 可以整个课本的内容走一下, 都很重要, 需要通通过一篇.
@@ -107,6 +117,12 @@ job 5 at Fri Mar  1 23:31:00 2019
 - crontab -e 编辑任务 
 - crontab -r 删除当前所有
 - crontab <filename> 以fiename内容替换
+
+
+### 奇偶分钟开始
+### 分钟配成*的话,就会每分钟来一次
+### 多个时间段可以用,分开
+### 天或周几是或的关系,其余都是和的关系
 
 
 ## 4.3 系统cron作业
