@@ -3,6 +3,184 @@ plan
 
 # 1. 管理Linux进程优先级
 
+## 1.1 优先级和"nice"概念
+
+### Linux进程调度和多任务
+
+#### 插一个nohup的演示
+```bash
+
+nice -n 13 firefox 2>&1 >/dev/null &
+
+kiosk@foundation0 ~]$ pstree $(echo $$)
+bash─┬─firefox───39*[{firefox}]
+     └─pstree
+
+```
+
+总的来说, 我们这个只是一个分时系统.(据说有一些实时系统用于航天,CPU主频很低,很慢,但这个系统很皮厚,能应付各种太空中的射线)<br>
+
+也就是我们实际运行的线程数远远大于我们现在cpu core的数量. 不可能"一心一意",因此就有了进程调试.
+<br>
+当然,就进程调试来说,作为一整门操作系统的大课来说也是说不完的,我们在此仅仅是通过一些实验,来窥探一下linux系统的冰山一角而己.
+<br>
+
+### 相对优先级
+注意,我们说的优先级仅仅是在同一个时点,我们需要的core的数量小于我们进程需要core的数量,
+<br>
+进程与进程之间存在竞争关系,这个时候,优先级的意义才体现出来.
+
+打个不太恰当的比方就是, 我们整个操作系统就是一个到火车站买票的过程, 如果平时我们买票的人多于火车站买票的窗口,那么就必须在各窗口中<br>
+进行排队,那么假设每个窗口是一样的(事实上不是如此),而排队的过程有点混乱,如个一个人比较强状,那么他的优先级会比较高,那么他可能从排队中<br>
+更容易往前挤,,但是,,,如果某个时间点,,,有10个窗口,但只有五个人买票,那么这个时候是否强状其实都不太管用...因为这个时候根本不用抢....
+而操作系统很很空闲时,就有点这个情况...因此讨论这个优先级时,也不能太太绝对.
+
+<br>
+当然,大多数时候还是需要排队的,而事实上,不一定是强状就可以的(也就是不一定nice值高就OK的)就如我们平时排队买票的时候也有分军人专列,<br>
+老弱病残孕专列(当然,,会有人说自己脑残之后钻了空子去这个地方)....对应操作系统就是有一些系统级的相关进程生来就是优先级高,本身就是能得到<br>
+更多的系统资源的.
+
+
+几种调度策略
+```bash
+man sched_setscheduler
+...
+Currently, Linux supports the following "normal" (i.e., non-real-time) scheduling policies:
+
+       SCHED_OTHER   the standard round-robin time-sharing policy;
+
+       SCHED_BATCH   for "batch" style execution of processes; and
+
+       SCHED_IDLE    for running very low priority background jobs.
+
+       The  following  "real-time"  policies  are  also  supported, for special time-critical applications that need precise control over the way in which
+       runnable processes are selected for execution:
+
+       SCHED_FIFO    a first-in, first-out policy; and
+
+       SCHED_RR      a round-robin policy.
+
+       The semantics of each of these policies are detailed below.
+
+....
+
+```
+
+进程的真实优先级= 进程的初始优先级+nice值
+
+而优行级值越小, 分到CPU的分片就越多,
+
+普通用户设置的nice值只能是正的,也就是nice值越来越大,也就是只能放弃自己的CPU...
+而只有root用户才可以把nice值设小那么才有可能真正地提高优先级
+
+
+### 分时系统的一些说明
+就举个例子我们听音乐, 其实播放音乐的进程不用一直用着CPU只是需要在每隔一段时间用一下, 当然,这个时间比起我们正常人以0.1秒左右的感知说,
+<br>已经很长了.但类似[视觉暂留](http://kingdarling.blogspot.com/2013/02/blog-post_4013.html)(海狮加皮球,),听觉其实也有类似的.因此我们进程在一边放音乐,一边在处理着后台的一系列事情.<br>
+所以如果有CPU高占时我们能感觉到卡是从鼠标不跟手.声音断断续续这些各种表像进行(当然,也可以从CPU风扇的声音及温度来说).
+
+
+## 用nice 设定优先级并启动程序
+
+设定这个值是单向的,, 不能让这个进程得到更多的时间片(不然就需要内核程序去维护一个进程超初优先级的列表)
+```bash
+[kiosk@foundation0 ~]$ nice -n 13 firefox &
+[1] 4409
+[kiosk@foundation0 ~]$ renice -n 10 $(pidof firefox)
+[kiosk@foundation0 ~]$ renice -n 15 $(pidof firefox)
+4409 (process ID) old priority 13, new priority 15
+[kiosk@foundation0 ~]$ renice -n 14 $(pidof firefox)
+renice: failed to set priority for 4409 (process ID): Permission denied
+
+ps axo pid,comm,nice --sort=nice
+
+```
+
+另外用top也是可以的,按r
+
+
+## 发现进程优先级实验
+用`lscpu`可以看到cpu的个数
+也可以用 `grep -c '^processor' /proc/cpuinfo`
+
+这些实验及练习都很有必要做, 一个个去做吧 
+
+
+# 2.使用访问控制列表(ACL)控制对文件的访问
+
+## 2.1 ACL(访问控制列表)
+
+ext4对ACL的支持需要额外的挂载选项.
+
+### 举一个传统UGO不能实列的例子
+
+```bash
+ for USER in user{1..4}; do useradd ${USER};done
+ [root@server0 tmp]# mkdir ugo
+[root@server0 tmp]# chown user1:user1 ugo
+[root@server0 tmp]# chmod 751 ugo
+[root@server0 tmp]# ls -ld ugo
+drwxr-x--x. 2 user1 user1 6 Mar  3 12:15 ugo
+[root@server0 tmp]# usermod -aG user1 user2
+[root@server0 tmp]# grep '^user1' /etc/group
+user1:x:1008:user2
+[root@server0 tmp]#
+[root@server0 tmp]# setfacl -m u:user4:- ugo
+
+ 
+```
+
+测试
+````bash
+[kiosk@foundation0 ~]$ ssh root@server0
+root@server0's password:
+Last login: Sun Mar  3 11:53:52 2019 from 172.25.0.250
+[root@server0 ~]# sudo -i -u user4
+[user4@server0 ~]$ cd /tmp/ugo
+-bash: cd: /tmp/ugo: Permission denied
+[user4@server0 ~]$
+[user4@server0 ~]$ logout
+[root@server0 ~]# sudo -i -u user3
+[user3@server0 ~]$ cd /tmp/ugo
+[user3@server0 ugo]$ ls
+ls: cannot open directory .: Permission denied
+[user3@server0 ugo]$ exit
+logout
+[root@server0 ~]# sudo -i -u user2
+[user2@server0 ~]$ cd /tmp/ugo
+[user2@server0 ugo]$ ls
+efg
+[user2@server0 ugo]$ echo "abc">mmk
+-bash: mmk: Permission denied
+[user2@server0 ugo]$ umask
+0002
+[root@server0 ~]# sudo -i -u user1
+[user1@server0 ~]$ cd /tmp/ugo/
+[user1@server0 ugo]$ ls
+[user1@server0 ugo]$ echo "mmq">efg
+[user1@server0 ugo]$ ll
+total 4
+-rw-rw-r--. 1 user1 user1 4 Mar  3 12:20 efg
+[user1@server0 ugo]$ ls -lrt
+total 4
+-rw-rw-r--. 1 user1 user1 4 Mar  3 12:20 efg
+[user1@server0 ugo]$ logout
+
+````
+
+### setfacl用了getfacl的输出
+```bash
+[root@server0 ~]# touch a
+[root@server0 ~]# touch b
+[root@server0 ~]# getfacl a|setfacl --set-file=- b
+```
+
+
+### 优先级的一个示例
+
+
+
+
 # 3.管理SELinux安全性
 
 说文解字SELinux(Sercurity Enhanced Linux)

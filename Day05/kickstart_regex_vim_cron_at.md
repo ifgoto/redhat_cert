@@ -120,7 +120,22 @@ job 5 at Fri Mar  1 23:31:00 2019
 [student@desktop0 ~]$ atq
 
 ```
+这个时间格式也可以结合一下date去进行讲解.
 
+ctrl+d可以终止某个在线的编辑
+
+```bash
+ while [ $(atq|wc -l) -gt 0 ] do  echo "sleep 1s"; done
+```
+
+ctrl+c
+ctrl+\
+ctrl+s ctrl+q
+ctrl+z
+
+at 定时任务做一个定线..
+
+#### 利用at命令进行还原操作(以进行保险)
 
 ## 4.2 cron周而复始
 - crontab -l 列出任务
