@@ -368,7 +368,7 @@ drwxr-xr-x. root root system_u:object_r:httpd_sys_content_t:s0 /virtual/
 ```
 
 ### RH134P125 更改SELinux上下文练习
-- (输入/custom时可以ctrl+x ctrl+f 补全)
+- (输入/custom时可以ctrl+x ctrl+f 路径补全)
 - (该实验中打开server0的firefox需要在foundation中 ssh -X 登陆)
 - (如果一时间httpd_sys_content_t这个类型记不住,可以semanage fcontext -l|grep /var/wwww来借以查看类型)
 - (如果对httpd.conf相关配置文件的配置完成后,可以用`httpd -t  -f httpd.conf`这个命令对配置文件进行语法检测)
