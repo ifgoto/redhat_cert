@@ -465,7 +465,6 @@ getent passwd ldapuser0
 ```bash
 mkdir -p /home/guests/ldapuser0
 chown -R ldapuser0:ldapuser0 /home/guests/ldapuser0
-
 ```
 
 

@@ -2,6 +2,8 @@
 
 # 1. 添加磁盘,分区及文件系统
 
+[Cylinder-head-sector](https://en.wikipedia.org/wiki/Cylinder-head-sector)
+
 ## 1.1 fdisk
 ### fstab
 - 再次安利一下vim打开fstab这个文件的时候, 如果写少了一个选项会有个语法检查的
@@ -262,5 +264,198 @@ mount: wrong fs type, bad option, bad superblock on /dev/mapper/ff-mylv,
 - raid5
 
 有空可以说这个, 虽然考试不用考
+
+# 3. 利用NFS访问其它机器的存储
+
+NOTE:与挂载一起讲的可以说一下平时我们操作的记录输出日志, 那样可以就出问题时,有据可查, 也可以在实验失败之后,<br>
+多次重复copy命令省去一些时间(当然最快的是history)
+
+## 3.1 挂载NFS
+
+### 挂载时几个安全参数的区别
+
+- none
+- sys
+- krb5
+- krb5i
+- krb5p
+
+### 挂载的三个基本步骤
+
+也可以用`rpcinfo -p localhost`去查一下端口
+####  识别`showmount -e  server0`(此时要注意服务器的防火墙是否关了,可用iptable -F进行验证)
+```bash
+[root@desktop0 ~]# rpcinfo -p server0
+rpcinfo: can't contact portmapper: RPC: Remote system error - No route to host
+#此时在server0执行iptables -F
+[root@desktop0 ~]# rpcinfo -p server0
+   program vers proto   port  service
+    100000    4   tcp    111  portmapper
+    100000    3   tcp    111  portmapper
+    100000    2   tcp    111  portmapper
+    100000    4   udp    111  portmapper
+    100000    3   udp    111  portmapper
+    100000    2   udp    111  portmapper
+    100024    1   udp  57267  status
+    100024    1   tcp  56235  status
+    100005    1   udp  20048  mountd
+    100005    1   tcp  20048  mountd
+    100005    2   udp  20048  mountd
+    100005    2   tcp  20048  mountd
+    100005    3   udp  20048  mountd
+    100005    3   tcp  20048  mountd
+    100003    3   tcp   2049  nfs
+    100003    4   tcp   2049  nfs
+    100227    3   tcp   2049  nfs_acl
+    100003    3   udp   2049  nfs
+    100003    4   udp   2049  nfs
+    100227    3   udp   2049  nfs_acl
+    100021    1   udp  49010  nlockmgr
+    100021    3   udp  49010  nlockmgr
+    100021    4   udp  49010  nlockmgr
+    100021    1   tcp  41083  nlockmgr
+    100021    3   tcp  41083  nlockmgr
+    100021    4   tcp  41083  nlockmgr
+    100011    1   udp    875  rquotad
+    100011    2   udp    875  rquotad
+    100011    1   tcp    875  rquotad
+    100011    2   tcp    875  rquotad
+[root@desktop0 ~]#
+
+```
+
+#### 挂载点 在本机建立相关目录, 注意权限不能太低(mkdir)
+
+#### 挂载(mount) 
++ 手动 mount -t nfs -o sync server0:/share /mountpoint(其中-t并未严格要求, 但-o的话要根据实际情况而定)
++ 自动(写在/etc/fstab)
+
+#### 用umount取消挂载
+
+/etc/mtab 与 mount的输出大体相同
+```bash
+[root@desktop0 ~]# ls -l /etc/mtab
+lrwxrwxrwx. 1 root root 17 May  7  2014 /etc/mtab -> /proc/self/mounts
+```
+RH134P232实验的时候, 有几个点(如果 /etc/fstab 中/shares/public写成了/share/public<少了个s,也就是路径写错了>会卡死(有时)>)
+如果server0不能被showmount -e server0(在desktop0中运行),那么需要在server0用`iptables -F`关掉防火墙(当然也可能关得更细致)
+
+iptables 中的-F解释
+```bash
+  -F, --flush [chain]
+              Flush the selected chain (all the chains in the table if none is given).  This is equivalent to deleting all the rules one by one.
+
+```
+如果desktop由于mount卡死了,那么请reset一下desktop,注意,只需要reset, desktop即可(或者有谁有更精准的解决方案也麻烦提出一下)
+
+## 3.2 自动挂载
+装了autofs后,可以看出超时值为
+````bash
+[root@desktop0 ~]# grep -i ^timeout /etc/sysconfig/autofs
+TIMEOUT=300
+
+````
+
+RH134P240的 练习中如果ssh  ldapuser0@localhost登陆不成功,可能是key下载时错了.
+像我就试过wget时, 把大写的O写成了小写的o
+那么本来存 key 的krb5.keytab的内容变成了下面这个样子
+````bash
+cat krb5.keytab
+--2019-03-07 05:07:08--  http://classroom.example.com/pub/keytabs/desktop0.keytab
+Resolving classroom.example.com (classroom.example.com)... 172.25.254.254
+Connecting to classroom.example.com (classroom.example.com)|172.25.254.254|:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 1258 (1.2K)
+Saving to: ‘desktop0.keytab’
+
+     0K .                                                     100%  101M=0s
+
+2019-03-07 05:07:08 (101 MB/s) - ‘desktop0.keytab’ saved [1258/1258]
+
+````
+
+```bash
+遇到这种情况的时候只能reset(根据修改server0:/etc/exportfs, 去掉sec=krb5p之后发现可以挂载, 证实是krb5p的问题)
+mount -vv可以看得更清楚
+[root@desktop0 ~]# mount -t nfs -o sec=krb5p,rw,sync  server0:/shares/public /mnt/public -vv
+mount.nfs: timeout set for Thu Mar  7 07:47:33 2019
+mount.nfs: trying text-based options 'sec=krb5p,vers=4,addr=172.25.0.11,clientaddr=172.25.0.10'
+mount.nfs: mount(2): Permission denied
+mount.nfs: access denied by server while mounting server0:/shares/public
+
+
+```
+
+这个练习与之前的挂载练习一起做, 有时会出现上面说的permission denied, 这时一般需要重置,再单独做
+
+## 3.3 lab
+有一个需要注意的, 这些挂载, 考试时, 服务器都会给你设好, 我们一定是在客户端(desktop)去做的,不要搞错了
+
+# 4. 访问SAMBA共享
+
+与cmd net share一致
+## 4.1 访问具体SMB的网络存储
+
+
+需要安装
+cifs-utils
+yum -y install samba-client.x86_64
+
+
+### 三个步骤
+- 识别
+- 确定挂载点, 并创建挂载点(空目录)
+- 挂载网络文件系统.
+
+>识别共享
+>	[root@desktop0 ~]# smbclient -L 172.25.0.11 -U user01
+>	Enter user01's password: 
+>	Domain=[MYGROUP] OS=[Unix] Server=[Samba 4.1.1]
+>
+>		Sharename       Type      Comment
+>		---------       ----      -------
+>		rhce            Disk      
+>	创建挂载点
+>	[root@desktop0 ~]# mkdir /mnt/samba
+>
+>	挂载
+>	[root@desktop0 ~]# mount -o username=user01,password=redhat //172.25.0.11/rhce /mnt/samba/
+>
+>	[root@desktop0 ~]# tail -1 /etc/fstab
+>	//172.25.0.11/rhce	/mnt/samba	cifs	defaults,username=user01,password=redhat	0 0
+>
+>	写不了
+>
+>	[root@desktop0 samba]# touch 1.txt
+>	touch: cannot touch ‘1.txt’: Permission denied
+>
+>	原因：
+>	（1）写权限？
+>
+>	[root@server0 ~]# ll -d /samba/
+>	drwxr-xrwx. 2 root root 18 Aug  6 16:31 /samba/
+>	[root@server0 ~]# 
+>	（2）SELinux？
+>	[root@server0 ~]# chcon -R -t samba_share_t /sa>mba
+>	[root@server0 ~]# 
+>	[root@server0 ~]# getenforce 
+>	Enforcing
+>	[root@desktop0 samba]# touch 3.txt
+>
+
+## 4.2 RH134P246练习
+
+`credentials=/secure/student.smb`
+考试时,credentials这个单词应能写出
+
+## 4.3 LAB RH134P248
+
+这种挂载的实验一般是开头先要重置desktop,server,之后运行lab XXX setup,最后在desktop中lab XXX grade
+
+注意, 自动挂载前,可以先手动挂载验证, 
+
+自动挂载文件中 为://server0,而手动挂载时, 不用":"
+
+
 
 
