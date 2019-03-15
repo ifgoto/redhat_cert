@@ -9,5 +9,7 @@
 # [Day04](Day04/yum_df_mount_ln_find_kvm.md)
 # [Day05](Day05/kickstart_regex_vim_cron_at.md)
 # [Day06](Day06/nice_ACL_SELinux_ldap_kerberos.md)
+# [Day07](Day07/disk_lvm_nfs_samba.md)
+# [Day08](Day08/boot_troubleshotting_firewalld_sa2_review.md)
 # [课后作业及思考题](Homework/1660_20190223.md)
 
