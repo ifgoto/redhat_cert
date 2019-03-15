@@ -456,6 +456,9 @@ yum -y install samba-client.x86_64
 
 自动挂载文件中 为://server0,而手动挂载时, 不用":"
 
+### 一些疑问
+对于那些对接的挂载文件不一定非要放在/etc/auto.master.d/下面,也可以直接写在/etc/auto.master, 而且需要在课堂上演示一下, 修改需要通过
+`systemctl restart autofs`重启服务才行
 
-
+也可以显式地指定密码. smbclient -L ip -U username%password
 
