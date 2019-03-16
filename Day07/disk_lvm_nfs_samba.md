@@ -5,6 +5,8 @@
 [Cylinder-head-sector](https://en.wikipedia.org/wiki/Cylinder-head-sector)
 
 ## 1.1 fdisk
+
+### 此处也可以说明一下2048,2050问题(演示一下)
 ### fstab
 - 再次安利一下vim打开fstab这个文件的时候, 如果写少了一个选项会有个语法检查的
 如   

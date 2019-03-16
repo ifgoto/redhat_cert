@@ -164,5 +164,98 @@ systemctl set-default XXX.target
 [How to recover forgotten root password](https://rhel7tutorial.wordpress.com/how-to-recover-forgotten-root-password/)
 
 
+## 1.6 修复启动时出现的系统文件问题
+
+### 一些常见的问题
+
+#### 损坏的文件系统(一时间未想到怎样模拟)
+
+#### /etc/fstab
+
+##### UUID不存在
+
+##### 挂载点不存在
+
+##### 挂载点错误
+(上面这两点我到现在还是分不清)
+这里做练习时, 发现进行emergency模式还是可以直接在加载内核那行写emergency,<br>
+而不用像书本中那样写systemd.unit=emergency.target这么长 
+
+有时如果server这种机器不受控,可以在终端打开virt-manager再去控制机器
+
+修改内核参数出错后, 可以esc退出本次的修改, 再按e进入重新编辑
+
+## 1.7 修复加载器出问题(bootloader)
+
+## 
+pstree可以看到现在各个进程间的关系
+
+```bash
+[kiosk@foundation0 ~]$ systemctl list-units --type=target
+UNIT                  LOAD   ACTIVE SUB    DESCRIPTION
+basic.target          loaded active active Basic System
+cryptsetup.target     loaded active active Encrypted Volumes
+getty.target          loaded active active Login Prompts
+local-fs-pre.target   loaded active active Local File Systems (Pre)
+local-fs.target       loaded active active Local File Systems
+multi-user.target     loaded active active Multi-User System
+network-online.target loaded active active Network is Online
+network.target        loaded active active Network
+nss-lookup.target     loaded active active Host and Network Name Lookups
+paths.target          loaded active active Paths
+remote-fs-pre.target  loaded active active Remote File Systems (Pre)
+remote-fs.target      loaded active active Remote File Systems
+rpcbind.target        loaded active active RPC Port Mapper
+slices.target         loaded active active Slices
+sockets.target        loaded active active Sockets
+sound.target          loaded active active Sound Card
+swap.target           loaded active active Swap
+sysinit.target        loaded active active System Initialization
+timers.target         loaded active active Timers
+
+LOAD   = Reflects whether the unit definition was properly loaded.
+ACTIVE = The high-level unit activation state, i.e. generalization of SUB.
+SUB    = The low-level unit activation state, values depend on unit type.
+
+19 loaded units listed. Pass --all to see loaded but inactive units, too.
+To show all installed unit files use 'systemctl list-unit-files'.
+
+```
+
+## 1.8 再来一点猛的
+
+在server中
+```bash
+#注意不是/dev/vda1
+dd if=/dev/zero bs=1 count=446 of=/dev/vda
+
+```
+这样连grub菜单也被我们干掉了,这样开机时就没有选择了..这里我们需要挂载REHL7.0的iso进行troubleshotting中的rescue模式.
+
+可以的话演示一下chroot不然大家可能会有点晕
+之后 chroot /mnt/sysimage(注,如没有这步也会失败, 可以演示一下)
+grub2-install /dev/vda
+之后一直exit到reboot
 
 
+## 1.9 再点更猛的
+
+rm -rf /boot/*
+同上, 只不过要安装内核, grub2, 还要重新生成/boot/grub2/grub.cfg
+
+同时, 收回昨天说的没有直接挂/mnt这种玩法, 一般挂光驱,不挂其它东西时, 特别在rescue mode这种还是挺常有的.
+
+
+````bash
+chroot /mnt/sysimage
+
+mount /dev/cdrom /mnt
+rpm -ivh /mnt/Pack*/ker*-3*.rpm --force
+grub2-install /dev/vda
+
+grub2-mkconfig -o /boot/grub2/grub.cfg
+````
+
+
+# 2.firewall 
+按书讲即可, 基本上大部分还在RH254才讲
