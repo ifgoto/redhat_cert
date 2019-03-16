@@ -163,6 +163,32 @@ systemctl set-default XXX.target
 [12 Steps to Password Recovery for RHEL, CentOS 7 Linux](https://spr.com/password-recovery-for-rhel-centos-7-linux/)
 [How to recover forgotten root password](https://rhel7tutorial.wordpress.com/how-to-recover-forgotten-root-password/)
 
+### 1.5.2 给grub加密
+```bash
+在/etc/grub.d/00_header最后加入
+        cat << EOF
+set superusers="redhat"
+password redhat 123
+EOF
+
+```
+
+明文不安全??
+[grub with protection](https://askubuntu.com/questions/370693/how-to-add-the-grub-password-protection-to-the-os-load-process-instead-of-when-e)
+
+```bash
+# grub2-mkpasswd-pbkdf2
+Password: ****
+Reenter password: ****
+PBKDF2 hash of your password is grub.pbkdf2.sha512.10000.9CA4611006FE96BC77A...
+```
+in the /etc/grub.d/00_header
+```bash
+set superusers="root"
+password_pbkdf2 root grub.pbkdf2.sha512.10000.9CA4611006FE96BC77A...
+```
+
+`grub2-mkconfig -o /boot/grub2/grub.cfg`
 
 ## 1.6 修复启动时出现的系统文件问题
 
@@ -255,6 +281,7 @@ grub2-install /dev/vda
 
 grub2-mkconfig -o /boot/grub2/grub.cfg
 ````
+## 1.10 通过1.9,发现前面的都是浮云,只要有rescue盘..............
 
 
 # 2.firewall 
