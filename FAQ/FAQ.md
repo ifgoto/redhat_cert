@@ -95,4 +95,71 @@ rm: remove write-protected regular empty file ‘lfile2’? y
 
 ```
 
+## RH134总复习中, 第4步的第4个小点(mount -a后报错问题解决方法)
+
+### 问题描述 
+在中文书本中p302,4.5 mount -a后会报
+````bash
+[root@desktop0 ~]# mount -a
+mount.nfs: access denied by server while mounting server0.example.com:/essos
+````
+
+### 解决方法
+由于这个是我们desktop默认安装sssd后,相应的配置文件没有正常地生成,<br>
+导致sssd服务没有正常启动,导致kerber认证不通过(ssh ldapuser0@localhost不成功为佐证).
+因此我们需要要在课后题答案中,
+<br>1.1 (yum install -y sssd authconfig-gtk krb5-workstation )
+<br>1.2 authconfig-gtk之间多加一几步这个问题是可以解决的.
+#### 具体操作如下:
+- 1.1.3 从sssd.conf中找到相应的配置文件示例,并复制, 放到/etc/sssd/sssd.conf中
+具体操作如下:
+```bash
+man sssd.conf
+#得么手册类容,请到最后
+#找到这么一段
+
+EXAMPLE
+       The following example shows a typical SSSD config. It does not describe configuration of the domains themselves - refer to documentation on configuring domains for more
+       details.
+
+           [sssd]
+           domains = LDAP
+           services = nss, pam
+           config_file_version = 2
+
+           [nss]
+           filter_groups = root
+           filter_users = root
+
+           [pam]
+
+           [domain/LDAP]
+           id_provider = ldap
+           ldap_uri = ldap://ldap.example.com
+           ldap_search_base = dc=example,dc=com
+
+           auth_provider = krb5
+           krb5_server = kerberos.example.com
+           krb5_realm = EXAMPLE.COM
+           cache_credentials = true
+
+           min_id = 10000
+           max_id = 20000
+           enumerate = False
+
+#此时我们用鼠标"列模式选择"(此点南要注意,因为配置中太多的空格会识别不到报错)
+#此时我们按着alt键,进行列选模式,把光标移到[sssd]中的左边中括号,之后往下一直拖动鼠标到 ld_provider= ldap 这一行,
+#也就是最终会选择了这段内容
+```
+![](res/colum_select_sssd_conf.png)
+
+之后把这段内容放到新建的/etc/sssd/sssd.conf中去(也就是vim /etc/sssd/sssd.conf,之后按i进入插入模式之后再粘贴进去,保存后退出)
+
+- 1.1.4 限制该文件权限(由于该配置比较敏感,所以要改一下权限, 不然sssd服务会报错) `chmod 06000 /etc/sssd/sssd.conf`
+
+- 1.1.5 `systemctl start sssd` 启动该服务, 一般来说,应没有输出(no news is good news).之后就可以继续书本上的操作了.
+
+
+### 总结
+这种可能是由于我们的desktop环境问题也可能是红帽课本的问题,现在还不能统一下个结论. 其它能做的同学欢迎也加入讨论
 
