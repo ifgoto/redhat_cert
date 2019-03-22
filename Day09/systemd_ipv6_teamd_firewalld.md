@@ -401,6 +401,11 @@ IP6.ADDRESS[1]:                         ip = fe80::5054:ff:fe80:d1e0/64, gw = ::
 重点讲一下
 nmsetting与 ifcfg-*指令的比较这个表
 
+
+```bash
+有时遇到这种两个IP的话, 是因为自动获得一个,你手动又设了一下, 把method设为manual就好了
+```
+
 ### 删除链接
 `nmcli con del <con-name>`
 
@@ -451,3 +456,270 @@ traceroute -->traceroute6
 ## 剩下的练习,实验都可以做一下
 
  
+# 3. 配合链路和桥接
+
+## 3.1 配置网络合作
+
+几种模式
+- broadcast
+- roundrobin(RH254P59课后的练习可以改成这个试试)
+- activebackup
+- loadbalance
+- lacp
+
+### 重点是下面几句
+``````bash
+[root@server0 ~]# nmcli con add  type team con-name team0 ifname team0 config '{"runner":{"name":"activebackup"}}'
+Connection 'team0' (8412c309-608a-4d05-97bd-a6c89f615685) successfully added.
+[root@server0 ~]# nmcli con  mod team0 ipv4.addresses 192.168.0.100/24
+[root@server0 ~]# set -o vi
+[root@server0 ~]# nmcli con  mod team0 ipv4.method manual
+[root@server0 ~]# nmcli con add type team-slave con-name team0-port1 ifname eno1 master team0
+Connection 'team0-port1' (84aab5e8-e22c-49b9-a20c-fa46b9239b72) successfully added.
+[root@server0 ~]# nmcli con add type  team-slave con-name team0-port2 ifname eno2 master team0
+Connection 'team0-port2' (097fd86f-4c83-4081-abfb-4415a2f1c440) successfully added.
+[root@server0 ~]# teamdctl team0 state
+setup:
+  runner: activebackup
+ports:
+  eno1
+    link watches:
+      link summary: up
+      instance[link_watch_0]:
+        name: ethtool
+        link: up
+  eno2
+    link watches:
+      link summary: up
+      instance[link_watch_0]:
+        name: ethtool
+        link: up
+
+runner:
+  active port: eno1
+``````
+
+一定要设个static 的ip才行....所以有人说要1.2.3.4
+至少要有一个实际的接口加入才生效(也就是用teamdctl tema0 state 能看到)
+
+## 另外,注意,team0了之后,几个网卡的mac地址是一样的, 如果用vmware会有警告, 请忽略.
+
+
+### 全程如下
+````bash
+[root@server0 ~]# nmcli dev
+DEVICE  TYPE      STATE         CONNECTION
+eth0    ethernet  connected     System eth0
+eno1    ethernet  disconnected  --
+eno2    ethernet  disconnected  --
+ens7    ethernet  disconnected  --
+ens8    ethernet  disconnected  --
+lo      loopback  unmanaged     --
+[root@server0 ~]# nmcli con add  type team con-name team0 ifname team0 config '{"runner":{"name":"activebackup"}}'
+Connection 'team0' (8412c309-608a-4d05-97bd-a6c89f615685) successfully added.
+[root@server0 ~]# nmcli con  mod team0 ipv4.addresses 192.168.0.100/24
+[root@server0 ~]# set -o vi
+[root@server0 ~]# nmcli con  mod team0 ipv4.method manual
+[root@server0 ~]# nmcli con add type team-slave con-name team0-port1 ifname eno1 master team0
+Connection 'team0-port1' (84aab5e8-e22c-49b9-a20c-fa46b9239b72) successfully added.
+[root@server0 ~]# nmcli con add type  team-slave con-name team0-port2 ifname eno2 master team0
+Connection 'team0-port2' (097fd86f-4c83-4081-abfb-4415a2f1c440) successfully added.
+[root@server0 ~]# teamdctl team0 state
+setup:
+  runner: activebackup
+ports:
+  eno1
+    link watches:
+      link summary: up
+      instance[link_watch_0]:
+        name: ethtool
+        link: up
+  eno2
+    link watches:
+      link summary: up
+      instance[link_watch_0]:
+        name: ethtool
+        link: up
+
+runner:
+  active port: eno1
+[root@server0 ~]# nmcli dev dis eno1
+[root@server0 ~]# nmcli dev dis eno2
+[root@server0 ~]# nmcli dev conn eno2
+Device 'eno2' successfully activated with '097fd86f-4c83-4081-abfb-4415a2f1c440'.
+[root@server0 ~]# nmcli dev conn eno1
+Device 'eno1' successfully activated with '84aab5e8-e22c-49b9-a20c-fa46b9239b72'.
+[root@server0 ~]#
+[root@server0 ~]# teamdctl team0 state
+setup:
+  runner: activebackup
+ports:
+  eno1
+    link watches:
+      link summary: up
+      instance[link_watch_0]:
+        name: ethtool
+        link: up
+  eno2
+    link watches:
+      link summary: up
+      instance[link_watch_0]:
+        name: ethtool
+        link: up
+runner:
+  active port: eno2
+[root@server0 ~]#
+[root@server0 ~]#
+[root@server0 ~]# nmcli dev dis eno2
+[root@server0 ~]# teamdctl team0 state
+setup:
+  runner: activebackup
+ports:
+  eno1
+    link watches:
+      link summary: up
+      instance[link_watch_0]:
+        name: ethtool
+        link: up
+  eno2
+    link watches:
+      link summary: up
+      instance[link_watch_0]:
+        name: ethtool
+        link: up
+runner:
+  active port: eno1
+
+````
+### 另外这种接口如果dis之后再打开就没了, 不有像实际的那样
+````bash
+[root@server0 ~]# nmcli dev dis team0
+[root@server0 ~]# nmcli dev conn team0
+Error: Device 'team0' not found.
+[root@server0 ~]# teamdctl team0 state
+Device "team0" does not exist
+
+````
+
+### 相关配置文件
+大体与命令行无太大的差异, 
+<br>
+但是有一个非常不方便的地方就是json的双引号在最外的双引号内需要转义
+
+
+另外,复杂的配置会放在一个比较长的json中进行配好,再用nmcli con mod team0 team.config <json file>
+
+
+另外这里也可以分享一下json 与 xml 的体积大小比较,再变到html,再谈到文本与非文本的不安感.
+
+
+### teamnl,可以干扰已设好的team0
+
+### rh254p66这个练习会比较耗时, 至小要十到二十分钟, 看一下当时情况再安排(主要是输入,,基本不可能完成)
+
+
+## 3.2 配置软件网桥
+
+
+windows 相关的桥接
+![](res/windows_bridage.png)
+
+### 往事不堪.......
+也可以稍稍展开一下, 一系列的所谓神操作.让同房的入职不久的同事,不明觉厉...深感昨晚打呼噜太响不好...
+年年岁岁花相似, 岁岁年年人不同...这时来另一位新入职的同事,,,我也如法操作....结果,,在我沾沾自喜的时候, 他说, 下个360XXX不就可以了吗?.....
+我.....
+
+### 注意先team再bridge的话,用nmcli是不行的, 要直接上文件...
+可以引申一下不可能的可能
+
+具体操作, 就几张图,就几个命令
+
+![](res/bridage_nmcli.png)
+
+<br>
+
+![](res/bridge_cfg1.png)
+
+<br>
+
+![](res/bridge_cfg2.png)
+
+### brctl show
+nmcli 也有一些功能与上面这个命令重合
+
+### 学会桥接之后,我们就可以直接在外面访问server,desktop了
+具体做法(方法很多,能通就可以了,)
+我自己在vmware中加了一块nat的网卡(用了192.168.8.1)
+之后在foundation中加了一个br3,之后把新加入的网卡桥接入br3,
+之后再在server中加入新网卡, 选br3的..那么就可用192.168.8  这个网段了.
+
+但是,这个是不是最简单的了?是不是可以不加br??可以想想并试试
+
+### RH254p78的练习要15-30分钟, 可以做一下, 要让学员有心理准备,有点长
+总的来说RH254的练习, 实验比起之前的会更长, 更吃力..要好好锻炼一下.
+
+### summary
+![](res/teamAndBridge_summary.png)
+
+
+# 4. 网络端口的安全性
+
+其实最终都是操控 [netfilter](https://www.netfilter.org/)
+由于iptables, ip6tables, ebtables与firewalld都是冲突的,所以要先关闭掉一些, 避免冲突
+
+## firewall-cmd 一般操作
+
+对于危险规则的处理 加入--timeout=<TIMEINSECONDS>来规免完全对系统的失控,,
+
+终级大杀招  威力太大, 慎用
+`firewall-cmd --panic-on`
+
+
+## 直接规则
+firewall-cmd --direct .....
+(感觉, 就是之前iptables那一套)
+
+## rich-rule
+当一次想干多件事的时候
+
+也说一下规则排序, 有时很重要
+还有就是单单一条富规则内也有排序, (有先后的区别,不然会报错)
+ 
+![](res/diff_between_reject_and_drop.png)
+
+考试时, 如果一时短路了,写不出富规则, 那么就不要硬着一定用firewall-cmd,可以试一下用图型界面,, <br>
+如果非要用也可以从firewalld.richlanguage中找到相应的example
+
+考试时, 很多细节我们是记不信的, 多用man, rpm -ql packagename 找出资料,以作参考.
+
+##伪装和端口转发
+前都为作NAT(SNAT)
+
+后都是DNAT???(DNAT)
+
+## 管理selinux端口标记
+    
+    
+```bash
+
+[root@server0 ~]# semanage  port -l
+SELinux Port Type              Proto    Port Number
+
+afs3_callback_port_t           tcp      7001
+afs3_callback_port_t           udp      7001
+afs_bos_port_t                 udp      7007
+...
+
+```
+
+### 最后也可以演示一下 
+host.allow host.deny这个初级的防火墙
+
+## 把剩下的练习讲一下,一起做一下
+
+
+
+
+
+
+
