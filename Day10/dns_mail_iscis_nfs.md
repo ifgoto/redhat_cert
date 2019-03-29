@@ -34,6 +34,12 @@ host: files dns的先后顺序,观察ping classroom的变化
 
 
 # 3. 提供远程块存储
+从 HA-->vip->引出存储
+
+DAS
+NAS
+SAN
+    FC iscsi
 基本练习, 按书本走一趟,,desktop iscsi这个不用再install了,已装
 
 
