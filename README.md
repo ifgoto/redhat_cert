@@ -11,5 +11,9 @@
 # [Day06](Day06/nice_ACL_SELinux_ldap_kerberos.md)
 # [Day07](Day07/disk_lvm_nfs_samba.md)
 # [Day08](Day08/boot_troubleshotting_firewalld_sa2_review.md)
+# [Day09](Day09/systemd_ipv6_teamd_firewalld.md)
+# [Day10](Day10/dns_mail_iscis_nfs.md)
+# [Day11](Day11/mariaDB_httpd_bash.md)
+# [Day12](Day12/wsgi_bash_docker.md)
 # [课后作业及思考题](Homework/1660_20190223.md)
 
