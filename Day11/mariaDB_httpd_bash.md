@@ -14,6 +14,8 @@
 ### mariaDB与mysql的口水战
 ![](res/mariaDBvsMysql.png)
 
+[ranking](https://db-engines.com/en/ranking)
+
 [浅谈MySQL和MariaDB区别?](https://blog.csdn.net/qq_37187976/article/details/79117863)
 [为什么 Oracle 收购 MySQL 后仍保证其开源免费？](https://www.zhihu.com/question/49381733)
 [兼容性列表](https://mariadb.com/kb/en/library/mariadb-vs-mysql-compatibility/)
@@ -212,14 +214,23 @@ CA,数字签名
 # 3. bash脚本
 
 ## 3.1 脚本基础
-这里可以讲一下编译,与传统解释的差别,
-及bash不一定是最好的选择..(心态转变, 手中有锤子, 满眼是钉子,;学医三日,尽觉能治天下病, 学医三年, 尽觉翻尽天下经方而无方可开)
+这里可以讲一下编译,与传统解释的差别,(gcc bash )
 
+及bash不一定是最好的选择..(心态转变, 手中有锤子, 满眼是钉子,;学医三日,尽觉能治天下病, 学医三年, 尽觉翻尽天下经方而无方可开)
 #!/bin/bash  sharp-bang
 
-## 3.2 算术计算
 
-## 3.3 排错
+四种执行shell的方式
+- chmod +x执行
+- bash(sh) 接脚本名执行
+- source 脚本名
+- . 脚本名
+
+
+## 3.2 书本中终于有环境变量的定义了  rh256 p346
+## 3.3 算术计算
+
+## 3.4 排错
 
 
 # 4. 条件与控制语句
