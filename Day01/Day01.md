@@ -15,7 +15,7 @@
 <br>
 惨啦, 一不小心暴露了姓名,反正自我绍也忘了,正好,
 <br>我叫朱XX,在IT这行中混了十多年,大家可以叫我老朱.
-毕竟在IT界中,,见面就给你贴个工程师,叫X工的, 我被叫`朱工`时,总有时会被联想到"公猪",之类..不太好.<br>
+毕竟在IT界中,,见面就给你贴个工程师,叫X工的, 我被叫`朱工`时,在粤语里会让人联想到到"公猪",之类..不太好.<br>
 so, just call me 老朱, pls.
 <br>
 RHCSA是(Red Hat Certified System Administrator), 也就是系统管理员.
@@ -245,6 +245,18 @@ Red Hat Enterprise Linux Server release 7.1 (Maipo)
 
 其中虚拟控制台与终端的概念我们接下来讲述.
 
+````
+user
+----
+shell
+------
+systemcall
+------
+kernel
+---
+HW
+
+````
 
 ## 在桌面上运行命令行(Accessing the Command Line Using the Desktop)
 
@@ -289,6 +301,15 @@ GNOME was originally an acronym for GNU Network Object Model Environment, but th
 - Ctrl+Alt+F4 字符控制台
 - Ctrl+Alt+F5 字符控制台
 - Ctrl+Alt+F6 字符控制台
+
+
+#### 修改vmware默认切换热键
+此处需要注意,由于我们一般教学环境是用vmware装foundation,而vmware默认是用ctrl+alt作为从虚拟机切换到宿主系统中去,
+<br>
+因此我们需要进行修改对vmware进行修改<br>
+![](res/alter-vmware-switch-key1.png)<br>
+![](res/alter-vmware-switch-key2.png)
+
 
 ### 演示关机
 ### 通过桌面上的几个图标介绍后台的几个机器
