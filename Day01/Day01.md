@@ -484,10 +484,10 @@ k@t530:~/code$
 <br>
 以免一些密码信息外泄(如svn checkout出来时, 把密码写在了命令行中)
 
-```todo
-多个term不会把history追加,而不是overwrite
+#### [扩展]bash 下 history 会因多个终端而覆盖丢失
+[bash 下 history 会因多个终端而覆盖丢失，有好的解决方案吗？](https://www.zhihu.com/question/19863362)
 
-```
+
 
 #### 命令行间的快速操作
 
