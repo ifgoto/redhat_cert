@@ -258,6 +258,22 @@ HW
 
 ````
 
+```
+另一个例子就是
+su -  zhangsan
+有-是带个shell的, 会执行一系列的配置,
+而没有-的话也就是
+su  zhangsan的话, 只是一个身会的切换(id命令会显示变了, 可是很多配置其实是没有跟着切过去的)
+
+```
+```
+大家可以试一下
+即然shell只是这么一个外围打杂的, 那么是不是很不重要,,,让龙套领饭盒了,那么操作系统还能不能起来呢?大家可以试一下
+rm -f /bin/bash
+试一下, 看系统能否正常启动
+
+```
+
 ## 在桌面上运行命令行(Accessing the Command Line Using the Desktop)
 
 ### Gnome
@@ -417,6 +433,10 @@ tail 这个命令可以演示一下把一些字藏在一张图片中去...
 据说前两项要以装了bash这个shell就可以补出来, 
 <br>
 而第三个参数的补全需要装下面这个软件才能实现, 但我们手上的系统好像装机后默认就装了
+```
+ftp vs. lftp
+后者支持补全
+```
 
 ```bash
 [kiosk@foundation0 ~]$ yum list|grep bash-comple
@@ -463,6 +483,11 @@ k@t530:~/code$
 下面命令用于清理`history -c` 用以清理历史记录, 
 <br>
 以免一些密码信息外泄(如svn checkout出来时, 把密码写在了命令行中)
+
+```todo
+多个term不会把history追加,而不是overwrite
+
+```
 
 #### 命令行间的快速操作
 
