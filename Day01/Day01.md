@@ -601,6 +601,9 @@ set -o vi
 
 扩展可结合之前查C语言 .h .c,相时找到两个文件,可以用
 ls -l a.[ch]
+## [扩展]如何快速删除大文件
+[linux 快速删除大量/大文件](https://blog.csdn.net/liuxiao723846/article/details/51626305)
+大家可以实测一下,给出时间, 及看一下系统调用,提示(strace之类的命令是可以看到的)
 
 
 # 午休
