@@ -38,6 +38,26 @@ rht-vmctl status classroom
 >  2019/3/1 22:01:07
 >如果还不行,,那我再想想其它办法
 
+## 有学员反馈
+ssh student@172.25.0.10
+报not rounter之后连接不上desktop
+这种情况往往发生在刚启动foundation,这时desktop server是没有自动启动,我们就直接连接导致的, 需要用
+`rht-vmctl start desktop`命令把desktop启动,等启动完后(往往是可以ping通172.25.0.10),再ssh连接
+
+## desktop启动失败
+如图,
+![](res/bios_need_vt.png)
+由于windows宿主机没有打开VT导致foundation可以启动, 但desktop这种虚拟机套虚拟机不能正常启动
+在bios把相关的vt开关打开即可,
+具体操作如下
+(这边只是举例,不同的bios可能大同小异)
+
+重启机器，在出现操作系统界面前，按F2(根据不同电脑进入bios方法大致相同，我的笔记本为联想E46A),进入BIOS系统设置界面，选择“intel(R) Virtualization Technology” 这一项，默认为“Disabled”,禁用的，选择“Enabled”启用，选择F10保存，之后选择“YES”启动系统即可进行安装了。如下图
+![](res/open_bios_vt1.png)<br>
+![](res/open_bios_vt2.png)
+
+
+# 练习,实验类
 ## 总复习的字母不清
 ch16   的总复习键入的是
 `lab sa1-review setup`  注意是数字1而不是字母l
