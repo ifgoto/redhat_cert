@@ -44,6 +44,32 @@ ssh student@172.25.0.10
 这种情况往往发生在刚启动foundation,这时desktop server是没有自动启动,我们就直接连接导致的, 需要用
 `rht-vmctl start desktop`命令把desktop启动,等启动完后(往往是可以ping通172.25.0.10),再ssh连接
 
+### 20190521更新
+```
+对于这种情况还是比较复杂的,
+正同一一列举
+1. 只是没有rht-vmctl start desktop,就直接想上人家.....就.脆了..............
+
+2. rht-vmctl start desktop了,但等了老半天还是上不了...这个要一直ping,,,,之前就有一学员的电脑有点慢真的等了好像两三分钟才启动完..................
+(这种情况可以双击foundation.kiosk用户的桌面那个desktop 图标,又或者rht-vmctl start desktop进去看一下是不是卡住了, 还真的是慢
+
+3. 第三种情况是用上面说的方法进到了desktop 的图型界面,发现desktop已进入桌面了, 但IP没有,
+(或者不是172.25.0.10)这种情况可能需要手动设置一下, 如果设置一下好了(就是在foundation可以访问了)那么,请在foundation中运行以下命令
+
+rht-vmctl save desktop
+这样把现在OK的状态保存一下, 以后再运行reset就是从现在这个可以连接的状态为起点的了(当然以后想还原可以用rht-vmctl fullreset desktop来还原)
+
+4.这个比较麻烦,进去也设置不了(这时要确认foundationk  br0 br1是不是已打开,如果没有请手动点开, 如果点开后,重启destkop还是不行,那么请运行
+rht-vmctl fullreset desktop
+全量重置
+
+如果还是不行,那么请重新把环增装一次, 
+如果重新装把环境装一次还是不行,,,那么请换一个台机器
+如果换一台机器也不行, 那么请换一个老朱..
+那么换一个老朱还不行........
+
+```
+
 ## desktop启动失败
 如图,
 ![](res/bios_need_vt.png)
