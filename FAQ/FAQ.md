@@ -38,7 +38,7 @@ rht-vmctl status classroom
 >  2019/3/1 22:01:07
 >如果还不行,,那我再想想其它办法
 
-## 有学员反馈
+## 有学员反馈desktop连接不上
 ssh student@172.25.0.10
 报not rounter之后连接不上desktop
 这种情况往往发生在刚启动foundation,这时desktop server是没有自动启动,我们就直接连接导致的, 需要用
