@@ -829,7 +829,11 @@ LISTEN     0      128                                                           
 `/etc/sysconfig/network-scripts/ifcfg-<name>,
 `
 
-注意, 不建议DNS也在这个文件中配置, 不然每次修改DNS的时候, 也要网卡down,up也要停网, 只放在/etc/resolv.conf
+注意, 不建议DNS也在这个文件中配置, 不然每次修改DNS的时候, 也要网卡down,up也要停网, 只放在/etc/resolv.conf<br>
+
+``PEERDNS``
+
+还有peerdns这个不要设,yes, 这样的话dhcp会把dns的值写到resolv.conf中, 会把原来的值个修改, 如果你换了另外一个网段也不会自动恢复.
 
 ![](res/ifcfg-name.png)
 
@@ -848,12 +852,14 @@ Error: Object 'reload' is unknown, try 'nmcli help'.
 `hostname XXXX ` 可以临时修改主机名, 但不会写相应的配置文件, 因此重启后会失效, 
 `hostnamectrl set-hostname XXXX ` 修改会写文件, 重启后还是会生效.
 
+
 ### 配置文件
 
-/etc/hosts
+/etc/hosts<br>
+(之前的版本这个配置在/etc/sysconfig/network下)
 <br>
 man hosts
-可以支持长短格式.
+可以支持长短格式(FQDN??).
 
 ````bash
 nmcli con mod ID +ipv4.dns IP
@@ -944,6 +950,16 @@ etc/pki/
 
 -C 可以在打包时排除一些目录
 
+#### 平时解压只有UGO的RWX权限
+如果还需要 acl,selinux的话,需要相应加入 `--acls` , `--selinux` 选项
+
+#### 选项前 的"-"是可选的
+也应时 可以 tar -xf filename.tar.gz <br>
+也可以tar xf filename.tar.gz
+
+#### *.tar.gz与叫 *.tgz
+#### 如果打包与解压都用绝对路径的话,那么请都使用-P
+
 ## scp, sftp
 
 scp 与cp很像, 就只是通过ssh来进行文件cp, 对于目录也一样要加-r
@@ -959,3 +975,90 @@ put到他地.
 
 -av 这两个参数经常一起用
 命令用来同步两个目录
+
+### 做增量备份就是一个挺好应用场景
+### 下面是本地文件的一个例子
+```bash
+[student@server0 ~]$ mkdir src dst
+[student@server0 ~]$ cd src
+[student@server0 src]$ touch a b c
+[student@server0 src]$ cd ..
+[student@server0 ~]$ ls
+dst  src  tmp
+[student@server0 ~]$ rsync -av src dst
+sending incremental file list
+src/
+src/a
+src/b
+src/c
+
+sent 201 bytes  received 73 bytes  548.00 bytes/sec
+total size is 0  speedup is 0.00
+[student@server0 ~]$ cd dst
+[student@server0 dst]$ ls
+src
+[student@server0 dst]$ rm -rf src
+[student@server0 dst]$ cd ..
+[student@server0 ~]$ ls
+dst  src  tmp
+[student@server0 ~]$ rsync -av ./src/* dst
+sending incremental file list
+a
+b
+c
+
+sent 174 bytes  received 69 bytes  486.00 bytes/sec
+total size is 0  speedup is 0.00
+[student@server0 ~]$ find ./dst
+./dst
+./dst/a
+./dst/b
+./dst/c
+[student@server0 ~]$ cd src
+[student@server0 src]$ ls
+a  b  c
+[student@server0 src]$ touch d
+[student@server0 src]$ cd ..
+[student@server0 ~]$ rsync -av ./src/* dst
+sending incremental file list
+d
+
+sent 106 bytes  received 31 bytes  274.00 bytes/sec
+total size is 0  speedup is 0.00
+[student@server0 ~]$
+
+[student@server0 src]$ touch e
+[student@server0 src]$ cd ..
+[student@server0 ~]$ rsync -av src/ dst/
+sending incremental file list
+./
+e
+
+sent 133 bytes  received 34 bytes  334.00 bytes/sec
+total size is 0  speedup is 0.00
+[student@server0 ~]$ cd src
+[student@server0 src]$ ls
+a  b  c  d  e
+[student@server0 src]$ rm d
+[student@server0 src]$ ls
+a  b  c  e
+[student@server0 src]$ cd ..
+[student@server0 ~]$ ls
+dst  src  tmp
+[student@server0 ~]$ rsync -av src/ dst/
+sending incremental file list
+./
+
+sent 84 bytes  received 15 bytes  198.00 bytes/sec
+total size is 0  speedup is 0.00
+[student@server0 ~]$ rsync -av  --delete src/ dst/
+sending incremental file list
+deleting d
+
+sent 81 bytes  received 12 bytes  186.00 bytes/sec
+total size is 0  speedup is 0.00
+
+
+```
+
+另外如果远程需要加密可以用-e ssh这样用ssh加密, 不然远程走的文件是不加密的.

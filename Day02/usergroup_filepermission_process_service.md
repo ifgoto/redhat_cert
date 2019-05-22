@@ -538,7 +538,15 @@ sshd.service - OpenSSH server daemon
 
 ## 5.3 学完后可以用systemctl set-default 命令改变启动的状态(从图形界面变成字符界面)
 
+## 5.4 补充,sysvinit vs. systemd
 
+先上两个链接
+[SysVinit to Systemd Cheatsheet](https://fedoraproject.org/wiki/SysVinit_to_Systemd_Cheatsheet)<br>
+[Understanding and administering systemd](https://docs.fedoraproject.org/en-US/quick-docs/understanding-and-administering-systemd/)<br>
+
+![](res/Mapping_runlevels_to_targets.png)<br>
+![](res/Mapping_service_command01.png)<br>
+![](res/Mapping_service_command02.png)<br>
 
 # 6.相关模拟题
 应昨天学员相应的问题, 
@@ -567,4 +575,5 @@ Natasha，harry，sarah密码都是abc123!@#
 找出所有所有者是ira的文件，并把他们拷贝到/root/findresults目录。 
 
 ```
+
 
