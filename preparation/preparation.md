@@ -56,10 +56,17 @@
 点击启动虚拟机,如提示移动还是复制虚拟机, 一般来说我们选择复制即可.
 ![](res/vmsetting08.png)
 <br>
-稍等机器启动, 最后出现了桌面表明启动完成(默认用户kiosk不用输入密码也可登陆)
-![](res/vmstarted_on_desktop.png)
+如果启动出现<br>
+![](res/vm_start_fail01.png)<br>
+那么请修改虚拟机设置中的处理器选项,如下图,把不去勾选红圈中的两个选项即可.<br>
+![](res/vm_start_fail01_handle.png)<br>
+如果还是不行, 也可以检查一下,在bios中是否打开了相应的vt选择查看一下.<br>
+![](res/vm_start_fail02.png)<br>
+如果启动正常的同学请忽略上面的几种报错情况继续.<br>
+稍等机器启动, 最后出现了桌面表明启动完成(默认用户kiosk不用输入密码也可登陆)<br>
+![](res/vmstarted_on_desktop.png)<br>
 <br>
-可以通过点击桌面中的两个图标去启动desktop,server两台虚拟机.(后面会介绍通过命令启动)
+可以通过点击桌面中的两个图标去启动desktop,server两台虚拟机.(后面会介绍通过命令启动)<br>
 ![](res/vmDesktopAndServerView.png)
 ### 设置虚拟机与宿主机网络连接
 由于之前我们把vmnet1设为192.168.11/25 这种网络, 宿主机设为了192.168.11.1
