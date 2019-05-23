@@ -173,6 +173,20 @@ rpm2cpio wonderwidgets - 1.0-4.x86_6.rpm|cpio -id "*txt"
 ### rpm命令汇总
 ![](res/rpm_commands.png)
 
+### rpm 查看安装该包实际执行了什么
+
+(有一些*lib*.rpm的包是没有脚本的)
+`rpm -qp --scripts <rpmfilename>`
+
+### 关于rpm处理依赖的问题
+其实rpm也不是完全不能查找依赖,只不过...只能处理一些比较简单的依赖关系
+
+### 光看不装
+在某些特殊环境, 如生产, UAT等, 有时我们装未确认过的rpm包要小心, <br>
+此时可以用
+``
+rpm --script
+``
 
 ## yum
 
@@ -334,7 +348,9 @@ Linux desktop0.example.com 3.10.0-123.el7.x86_64 #1 SMP Mon May 5 11:16:57 EDT 2
 
 ### remove
 
-(或者有时发现一些很)
+(注意,在实际工作中, 特别是生产环境,慬用这个选项, 我自己未新历, <br>
+但听过有用remove 把一些基础依赖包把remove了, 结果服务器连登陆也失败的例子)
+
 ```bash
 [root@desktop0 ~]# yum install httpd
 Loaded plugins: langpacks
