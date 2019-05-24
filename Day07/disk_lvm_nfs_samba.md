@@ -267,6 +267,9 @@ mount: wrong fs type, bad option, bad superblock on /dev/mapper/ff-mylv,
 
 有空可以说这个, 虽然考试不用考
 
+## 2.5 LVM 红帽官方文档
+[LVM 红帽官方文档](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/logical_volume_manager_administration/index)
+
 # 3. 利用NFS访问其它机器的存储
 
 NOTE:与挂载一起讲的可以说一下平时我们操作的记录输出日志, 那样可以就出问题时,有据可查, 也可以在实验失败之后,<br>
