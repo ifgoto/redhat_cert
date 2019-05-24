@@ -339,14 +339,17 @@ Section 2: 去除密钥文件的密码
 openssl rsa -in rsa.pem -out rsa_pri.pem
 
 Section 3: 根据私钥生成公钥
-openssl rsa -in rsa.pem -pubout -out rsa_pub.pem
+openssl rsa -in rsa_pri.pem -pubout -out rsa_pub.pem
 
 Section 4: 使用公钥加密
+echo "1234567890" > test.txt
+md5sum test.txt
 openssl rsautl  -encrypt -in test.txt -out test.secret -pubin -inkey rsa_pub.pem
 
 Section 5: 使用私钥解密
-openssl rsautl -decrypt -in test.secret -out test.raw -inkey rsa.pem
+openssl rsautl -decrypt -in test.secret -out test.raw -inkey rsa_pri.pem
 
+md5sum test.raw
 
 ...
 ```
