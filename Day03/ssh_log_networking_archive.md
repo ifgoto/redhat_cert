@@ -317,6 +317,39 @@ PermitRootLogin no
 # 在本地主机A1登陆远程云主机B1，并进行本地端口转发。2000端口绑定本地所有网卡
 ssh -L 2000:localhost:3000 root@103.59.22.17
 
+## 1.6 对称加密
+```
+echo "abcdefg" > in.txt
+[root@server0 ~]# openssl enc -aes-128-cbc -in in.txt -out out.txt -K 1234567890123456 -iv 12345678
+[root@server0 ~]# openssl enc -aes-128-cbc -d -in out.txt -out plain.txt -K 1234567890123456 -iv 12345678
+[root@server0 ~]# cat plain.txt
+abcdefg
+```
+
+### 1.7 非对称加密
+[OpenSSL 之 RSA 相关命令学习笔记](https://my.oschina.net/fenying/blog/786238)
+```
+Section 0: 生成随机文件
+openssl rand -out ./randSrc.bin 67108864
+
+Section 1: 生成一个密钥文件
+openssl genrsa -rand randSrc.bin -aes256 -out rsa.pem 2048
+
+Section 2: 去除密钥文件的密码
+openssl rsa -in rsa.pem -out rsa_pri.pem
+
+Section 3: 根据私钥生成公钥
+openssl rsa -in rsa.pem -pubout -out rsa_pub.pem
+
+Section 4: 使用公钥加密
+openssl rsautl  -encrypt -in test.txt -out test.secret -pubin -inkey rsa_pub.pem
+
+Section 5: 使用私钥解密
+openssl rsautl -decrypt -in test.secret -out test.raw -inkey rsa.pem
+
+
+...
+```
 
 
 # 2. 分析,存储日志
