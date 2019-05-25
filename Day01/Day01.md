@@ -438,6 +438,14 @@ ftp vs. lftp
 后者支持补全
 ```
 
+<br>
+
+常见的环境变量<br>
+![](res/common_env.png)
+
+常见选项<br>
+![](res/common_option.png)
+
 ```bash
 [kiosk@foundation0 ~]$ yum list|grep bash-comple
 bash-completion.noarch                 1:2.1-6.el7                 @anaconda/7.1

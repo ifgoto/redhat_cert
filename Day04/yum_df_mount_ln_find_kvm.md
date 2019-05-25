@@ -29,7 +29,16 @@ Redhat Package Management
 
 RPM 软件包文件名称组合: name-version-release.architecture
 
-但有一个不好的地方, 就是不自动解决依赖问题.
+但有一个不好的地方, 就是不自动解决转复杂的依赖问题.
+
+
+### 编译安装,对编译安装相对熟悉的管理员
+如mysql等数据库, 有时特定模块编译安装,有人实测过编译安装过程有对本机的系统进行适配优化, 
+因此有可能获得更高的性能,(但也有反例,之前在AIX6时, 我自己编译vim没有弄好经常CPU高占..被别人BS).
+
+
+### 已经编译好的软件包
+里面其实是有脚本的, 早已定义了, 软件包中哪个文件,放哪里,(安装的过程也就是解包的过程)
 
 
 
@@ -50,7 +59,18 @@ gpg --verify notic.asc
 
 ```
 可以进到notic.asc中的数据中进行修改哪怕是一个字, 也能发现不同了.
-此时可以结合md5sum进行讲解
+此时可以结合md5sum进行讲解<br>
+
+
+#### 我们平时用到的两个gpgkey
+
+http://classroom.example.com/content/rhel7.0/x86_64/dvd/RPM-GPG-KEY-redhat-beta
+<br>
+http://classroom.example.com/content/rhel7.0/x86_64/dvd/RPM-GPG-KEY-redhat-release
+
+<br>
+所有rhel的公钥都一样的(尾数1d51那一个)
+
 
 
 
@@ -179,18 +199,21 @@ rpm2cpio wonderwidgets - 1.0-4.x86_6.rpm|cpio -id "*txt"
 `rpm -qp --scripts <rpmfilename>`
 
 ### 关于rpm处理依赖的问题
+
 其实rpm也不是完全不能查找依赖,只不过...只能处理一些比较简单的依赖关系
 
 ### 光看不装
+
 在某些特殊环境, 如生产, UAT等, 有时我们装未确认过的rpm包要小心, <br>
 此时可以用
 ``
 rpm --script
 ``
 
-## yum
+## yum(since RHEL5)
 
-较好解决依赖问题
+yellow update  dog managent<br>
+较好解决依赖问题<br>
 
 
 ### 列出资源
@@ -748,9 +771,18 @@ ln -s
 ESX Hv Kvm fullv
 Xen    pv
 
+### kvm 用libvirt新增rhel7失败
 
+可以搜<br>
 
-## 总复习
+unsupported invariant TSC<br>
+
+[不完全对](https://www.redhat.com/archives/virt-tools-list/2015-April/msg00032.html)<br>
+[比较精确指出](https://bugzilla.redhat.com/show_bug.cgi?id=1243932)<br>
+It's fixed in v1.2.0.<br>
+对比一下我们现在virt-manager这个版本发现的确是会出现问题的<br>
+
+# 总复习
 ch16   的总复习键入的是
 `lab sa1-review setup`  注意是数字1而不是字母l
 
