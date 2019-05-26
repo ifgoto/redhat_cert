@@ -83,6 +83,128 @@ rht-vmctl fullreset desktop
 ![](res/open_bios_vt2.png)
 
 
+## 为什么desktop,server都是dhcp过去,但ip却一直不变.
+
+在我们现在这个环境里面,dhcp服务是由classroom提供的,<br>
+我们到classroom中的 /etc/dhcp/dhcpd.conf中
+通过 下面语句引用到另一个脚本,
+````
+    # Include the individual VM numbers - added by rpm script    
+    include "/etc/dhcp/dhcpd-vm0.conf";                          
+````
+打开这个vm0号的脚本, 
+其中有下面片断
+````
+  host vm0-10 {
+      hardware ethernet 52:54:00:00:00:0A;
+      fixed-address 172.25.0.10;
+      option routers 172.25.0.254;
+      next-server 172.25.0.254;
+  }
+````
+其含义是把MAC地址为52:54:00:00:00:0A的机器固定分配
+172.25.0.10
+登陆到desktop0中
+
+ipconfig -a得出下面的
+````
+[root@desktop0 ~]# ifconfig -a
+eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 172.25.0.10  netmask 255.255.255.0  broadcast 172.25.0.255
+        inet6 fe80::5054:ff:fe00:a  prefixlen 64  scopeid 0x20<link>
+        ether 52:54:00:00:00:0a  txqueuelen 1000  (Ethernet)
+        RX packets 462  bytes 60661 (59.2 KiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 344  bytes 43219 (42.2 KiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10<host>
+        loop  txqueuelen 0  (Local Loopback)
+        RX packets 581  bytes 53392 (52.1 KiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 581  bytes 53392 (52.1 KiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+````
+其中 `ether 52:54:00:00:00:0a  txqueuelen 1000  (Ethernet)`就是eth0的mac
+上面就是desktop为什么一直为172.25.0.10 的原因, server 同理)
+
+## 为什么在按书本中执行了下面命令,hostname就改变了,
+```
+在中文片124的252页
+nmcli con add con-name "default" type ethernet ifname eth0
+nmcli con add con-name "static" ifname eth0  autoconnect no type ethernet ip4 172.25.0.10/24 gw4 172.25.0.254
+nmcli con up "static"
+```
+执行完上面三条命令后运行<br>
+
+```
+[root@desktop0 ~]# hostnamectl
+   Static hostname: n/a
+Transient hostname: localhost.localdomain
+         Icon name: computer
+           Chassis: n/a
+        Machine ID: 946cb0e817ea4adb916183df8c4fc817
+           Boot ID: 2ccd61567e5c4eac9c7a85e0f6238ffd
+    Virtualization: kvm
+  Operating System: Red Hat Enterprise Linux Server 7.0 (Maipo)
+       CPE OS Name: cpe:/o:redhat:enterprise_linux:7.0:GA:server
+            Kernel: Linux 3.10.0-123.el7.x86_64
+      Architecture: x86_64
+
+```
+发现主机名被修改<br>
+
+原因: dhcp去修改的或dns都有可能修改,<br>
+
+验证:<br>
+其实只要执行第二条,第三条指令就会出现这个效果(也就是与第一条default那个没有直接关系)<br>
+把desktop重置后, <br>
+直接运行<br>
+`nmcli con add con-name "static" ifname eth0  autoconnect no type ethernet ip4 172.25.0.10/24 gw4 172.25.0.254 `
+此时在foundation登陆classroom<br>
+ssh root@classroom<br>
+密码:Asimov<br>
+
+之后停止dhcp服务及dns服务<br>
+```
+ systemctl stop named.service
+ systemctl stop dhcpd.service
+```
+之后再执行<br>
+```
+nmcli con up "static"
+```
+并用下面命令一直观察<br>
+`while true; do hostnamectl;sleep 1 ;done
+`
+发现一直未变化.<br>
+
+当然,如果在up前<br>
+用hostnamectl set-hostname设了名字也能避免<br>
+
+有下面的链接作为参考<br>
+[ Using Hostnamectl](https://docs.fedoraproject.org/en-US/Fedora/18/html/System_Administrators_Guide/s1_Using_Hostnamectl.html)<br>
+[[Solved] Hostname automatic set when using dhcp](https://centos.org/forums/viewtopic.php?t=62502)
+
+
+但由于共用了网卡eth0,估计除了static这个con-name外, default,"System eth0",同时也会被up触发, 
+如何验证:
+在up前运行下面三个语句把他们去dhcp设置主机名的选项改成no,就不会发生
+```
+[root@desktop0 ~]# nmcli con modify "System eth0" ipv4.dhcp-send-hostname no
+[root@desktop0 ~]# nmcli con modify "static" ipv4.dhcp-send-hostname no
+[root@desktop0 ~]# nmcli con modify "default" ipv4.dhcp-send-hostname no
+```
+
+## 如何把server的eth0-->eth1
+ip link set eth0 name eth1 <br>
+但重启失效
+
+
+
 # 练习,实验类
 ## 总复习的字母不清
 ch16   的总复习键入的是
