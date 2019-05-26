@@ -311,6 +311,14 @@ PermitRootLogin no
 
 ## 1.4 [初见,工作原理,实践](https://www.jianshu.com/p/33461b619d53)
 
+### 密码登陆
+
+![](res/ssh_login_with_password.png)
+
+### 密钥登陆
+
+![](res/ssh_login_with_pub_key.png)
+
 ## 1.5 ssh端口转发
 
 [ssh端口转发](https://blog.fundebug.com/2017/04/24/ssh-port-forwarding/)
