@@ -213,6 +213,41 @@ ch16   的总复习键入的是
 ## 在server或desktop中运行rht-vmctl命令
 这两个命令是在foundation0中运行的, 在这两个机器中运行会无效的.
 
+## RH124P129页,某同学在实验时, bboop账户误写成了bbop,但为什么grade时,还显示bboop用户
+误把bboop写成bbop,但
+lab localusers grade时, 还是看到下面语句了
+```
+The account for bboop is not set to expire in 90 days.
+
+```
+学员疑问是为什么还看到这个账户, 我明明没有创建<br>
+
+简单回答是因为这个用户名固定写在了评估脚本了,不管你有没有创建.
+
+通过下面命令可以发现我们评估脚本其实具体在哪里
+````
+[root@server0 bin]# which lab
+/usr/local/bin/lab
+[root@server0 bin]# cd /usr/local/bin
+[root@server0 bin]# ls
+lab  lab-localusers  labtool.shlib
+
+````
+用vim打开`lab-localusers`,发现<br>
+46行<br>
+`46 USERS="sspade dtracy bboop" `<br>
+及106行<br>
+`106         echo "The account for $U is not set to expire in $ACCOUNT_EXPIRE_REQ days."`
+
+其中$U 从91行 `91 for U in $USERS `得知就是46行中固定写的那个bboop那个值,<br>
+
+因此我们没有创建也看到这个用户名.<br>
+
+
+从这个例子中我们学会如何进一步分析我们评估脚本的报错.
+
+ 
+
 ## RH124P136 ricky可以删除lfile1 lfile2
 有同学对此条有疑问, 理论上只要他对这个目录有w权限,他就可以删掉
 <br>
