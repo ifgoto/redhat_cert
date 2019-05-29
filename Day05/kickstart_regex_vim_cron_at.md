@@ -138,6 +138,8 @@ rm: cannot remove ?..?: Is a directory
 [student@desktop0 tmp]$ touch .h1 .h2        
 ```
 
+## 2.2 正则表达式(regrex)
+
 ```bash
 
  . 单个字符, 有像之前bash的"?"'
@@ -145,12 +147,15 @@ rm: cannot remove ?..?: Is a directory
  ? [0..1]
  * [0..无穷大] (表前面的字符出现0或多次)与之前shell的通配是不一样的[]
 如果要 与shell中的等价那就是 .* 才等于bash的*
-正则表达式不是通配符.(或者说与这bash的 regex不要弄混了)
+正则表达式不是通配符.(或者说与bash不要与regex 弄混了)
+^ begin
+$ end
 
 get -e 'cat' -e 'dog' file`同时看猫狗
 
 ```
-## grep 相关命令
+例子待被
+ grep 相关命令
 为什么有颜色,
 ```bash
 
@@ -159,6 +164,22 @@ alias grep='grep --color=auto'
 
 ```
 
+当然, 还可以扩展讲一下grep的用法, 具体先man grep讲一下,<br>
+-F -E -e -G -P <br>
+-v<br>
+-i<br>
+-w<br>
+-n<br>
+-r<br>
+-l<br>
+-q -s<br>
+-B<br>
+-A<br>
+-C<br>
+
+当然, 如果大家还学有余力, 想进一步找不痛快, 还有一本关于这方面的书在等着大家<br>
+
+![](res/master_regular_expressions.png)
 
 
 其余部分 
