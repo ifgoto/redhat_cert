@@ -13,6 +13,8 @@ plan
 ## 竞品
 - jumpstart Oracle Solaris
 - unattened installation for Micrsoft Windows
+## overview
+![](res/kickstart_server_client_overview.png)
 ## step
 ## 1.1 弄出kickstart配置文件
 ## 1.2 发布配置文件(http,ftp....)
@@ -20,6 +22,121 @@ plan
 
 
 # 2. 正则表达式
+
+注意要与这前bash的通配置的区别
+
+## 2.1 bash 通配符
+
+```
+? 表示1个, 不能是0个或多个
+
+[] 表示在里面的都配置
+[^] 不配置里面的
+[!] 不配置里面的
+* 配置任意长度,任意字符
+
+例外: * ? 不能配置隐藏文件的.
+```
+一般规则
+````
+[student@desktop0 ~]$ mkdir tmp
+[student@desktop0 ~]$ cd tmp
+[student@desktop0 tmp]$ touch a a1 a2 b1 b2 b1234 
+[student@desktop0 tmp]$ ls a?
+a1  a2
+[student@desktop0 tmp]$ ls b?
+b1  b2
+[student@desktop0 tmp]$ ls a*
+a  a1  a2
+[student@desktop0 tmp]$ ls b??*
+b1234
+[student@desktop0 tmp]$ ls b*
+b1  b1234  b2
+[student@desktop0 tmp]$ ls [ab]?
+a1  a2  b1  b2
+[student@desktop0 tmp]$ ls [ab]*
+a  a1  a2  b1  b1234  b2
+[student@desktop0 tmp]$ touch c1 c2 c d d1 d12 d123
+[student@desktop0 tmp]$ touch da1
+[student@desktop0 tmp]$ ls [^ab]?
+c1  c2  d1
+[student@desktop0 tmp]$ ls [^ab]*
+c  c1  c2  d  d1  d12  d123  da1
+
+````
+
+例外: * ? 不能配置隐藏文件的.
+```
+[student@desktop0 tmp]$ touch .f1 .f2                                                                                                                                                                       
+[student@desktop0 tmp]$ ls                                                                                                                                                                                  
+a  a1  a2  b1  b1234  b2  c  c1  c2  d  d1  d12  d123  da1                                                                                                                                                  
+[student@desktop0 tmp]$ ls -ah                                                                                                                                                                              
+.  ..  a  a1  a2  b1  b1234  b2  c  c1  c2  d  d1  d12  d123  da1  .f1  .f2                                                                                                                                 
+[student@desktop0 tmp]$ ls -a                                                                                                                                                                               
+.  ..  a  a1  a2  b1  b1234  b2  c  c1  c2  d  d1  d12  d123  da1  .f1  .f2                                                                                                                                 
+[student@desktop0 tmp]$ ls -a                                                                                                                                                                               
+.  ..  a  a1  a2  b1  b1234  b2  c  c1  c2  d  d1  d12  d123  da1  .f1  .f2                                                                                                                                 
+[student@desktop0 tmp]$ rm *                                                                                                                                                                                
+[student@desktop0 tmp]$ ls                                                                                                                                                                                  
+[student@desktop0 tmp]$ ls -a                                                                                                                                                                               
+.  ..  .f1  .f2                                                                                                                                                                                             
+[student@desktop0 tmp]$ rm .*                                                                                                                                                                               
+rm: cannot remove ?.?: Is a directory                                                                                                                                                                       
+rm: cannot remove ?..?: Is a directory                                                                                                                                                                      
+[student@desktop0 tmp]$ ls -a                                                                                                                                                                               
+.  ..                                                                                                                                                                                                       
+[student@desktop0 tmp]$ touch .g1 .g2                                                                                                                                                                       
+[student@desktop0 tmp]$ rm .[!.]*                                                                                                                                                                           
+[student@desktop0 tmp]$ ls -a                                                                                                                                                                               
+.  ..                                                                                                                                                                                                       
+[student@desktop0 tmp]$ touch .h1 .h2        
+[student@desktop0 tmp]$ touch .f1 .f2                                                                                                                                                                       
+[student@desktop0 tmp]$ ls                                                                                                                                                                                  
+a  a1  a2  b1  b1234  b2  c  c1  c2  d  d1  d12  d123  da1                                                                                                                                                  
+[student@desktop0 tmp]$ ls -ah                                                                                                                                                                              
+.  ..  a  a1  a2  b1  b1234  b2  c  c1  c2  d  d1  d12  d123  da1  .f1  .f2                                                                                                                                 
+[student@desktop0 tmp]$ ls -a                                                                                                                                                                               
+.  ..  a  a1  a2  b1  b1234  b2  c  c1  c2  d  d1  d12  d123  da1  .f1  .f2                                                                                                                                 
+[student@desktop0 tmp]$ ls -a                                                                                                                                                                               
+.  ..  a  a1  a2  b1  b1234  b2  c  c1  c2  d  d1  d12  d123  da1  .f1  .f2                                                                                                                                 
+[student@desktop0 tmp]$ rm *                                                                                                                                                                                
+[student@desktop0 tmp]$ ls                                                                                                                                                                                  
+[student@desktop0 tmp]$ ls -a                                                                                                                                                                               
+.  ..  .f1  .f2                                                                                                                                                                                             
+[student@desktop0 tmp]$ rm .*                                                                                                                                                                               
+rm: cannot remove ?.?: Is a directory                                                                                                                                                                       
+rm: cannot remove ?..?: Is a directory                                                                                                                                                                      
+[student@desktop0 tmp]$ ls -a                                                                                                                                                                               
+.  ..                                                                                                                                                                                                       
+[student@desktop0 tmp]$ touch .g1 .g2                                                                                                                                                                       
+[student@desktop0 tmp]$ rm .[!.]*                                                                                                                                                                           
+[student@desktop0 tmp]$ ls -a                                                                                                                                                                               
+.  ..                                                                                                                                                                                                       
+[student@desktop0 tmp]$ touch .h1 .h2        
+[student@desktop0 tmp]$ touch .f1 .f2                                                                                                                                                                       
+[student@desktop0 tmp]$ ls                                                                                                                                                                                  
+a  a1  a2  b1  b1234  b2  c  c1  c2  d  d1  d12  d123  da1                                                                                                                                                  
+[student@desktop0 tmp]$ ls -ah                                                                                                                                                                              
+.  ..  a  a1  a2  b1  b1234  b2  c  c1  c2  d  d1  d12  d123  da1  .f1  .f2                                                                                                                                 
+[student@desktop0 tmp]$ ls -a                                                                                                                                                                               
+.  ..  a  a1  a2  b1  b1234  b2  c  c1  c2  d  d1  d12  d123  da1  .f1  .f2                                                                                                                                 
+[student@desktop0 tmp]$ ls -a                                                                                                                                                                               
+.  ..  a  a1  a2  b1  b1234  b2  c  c1  c2  d  d1  d12  d123  da1  .f1  .f2                                                                                                                                 
+[student@desktop0 tmp]$ rm *                                                                                                                                                                                
+[student@desktop0 tmp]$ ls                                                                                                                                                                                  
+[student@desktop0 tmp]$ ls -a                                                                                                                                                                               
+.  ..  .f1  .f2                                                                                                                                                                                             
+[student@desktop0 tmp]$ rm .*                                                                                                                                                                               
+rm: cannot remove ?.?: Is a directory                                                                                                                                                                       
+rm: cannot remove ?..?: Is a directory                                                                                                                                                                      
+[student@desktop0 tmp]$ ls -a                                                                                                                                                                               
+.  ..                                                                                                                                                                                                       
+[student@desktop0 tmp]$ touch .g1 .g2                                                                                                                                                                       
+[student@desktop0 tmp]$ rm .[!.]*                                                                                                                                                                           
+[student@desktop0 tmp]$ ls -a                                                                                                                                                                               
+.  ..                                                                                                                                                                                                       
+[student@desktop0 tmp]$ touch .h1 .h2        
+```
 
 ```bash
 
