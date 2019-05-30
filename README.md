@@ -1,7 +1,7 @@
 大家好, 这是我RHCE备课的目录页
 # [顶置] 5,6,7,8各版命令对照表
-## [https://access.redhat.com/solutions/1354353](网页版)
-## [res/rhel_5_6_7_8_cheatsheet_a4_0519.pdf](pdf)
+## [网页版](https://access.redhat.com/solutions/1354353)
+## [pdf](res/rhel_5_6_7_8_cheatsheet_a4_0519.pdf)
 # [FAQ(常见问题)](FAQ/FAQ.md)
 # [环境准备](preparation/preparation.md)
 
