@@ -196,10 +196,63 @@ alias grep='grep --color=auto'
 
 # 4. 计划任务
 
+## 4.0 其实如果只干一票也可以用下面的简单方法
+我在不知道有at时, 就是这么干的.
+
+````
+k@t530:~$ sleep 10 && echo my scheduling job
+[1]+  Done                    sleep 10
+my scheduling job
+````
+当然,如果更复杂的话, 可以写在脚本中去.
+
 ## 4.1 at 只干一票的
+
+只能着眼于未来
+```
+k@t530:~$ sleep 10 && echo my scheduling job
+[1]+  Done                    sleep 10
+my scheduling job
+
+```
+
+如果不输入具体时间, 与当前提交任务时间相同
+```
+[student@desktop0 ~]$ at 2019-06-01                                                                                                                                                                         
+at> date > ~/at_date.txt                                                                                                                                                                                    
+at> <EOT>                                                                                                                                                                                                   
+job 1 at Sat Jun  1 22:33:00 2019                                                                                                                                                                           
+[student@desktop0 ~]$ atq                                                                                                                                                                                   
+1       Sat Jun  1 22:33:00 2019 a student 
+```
+
+时间需要写在后面
+```
+[student@desktop0 ~]$ at 2019-06-02 09:30
+syntax error. Last token seen: 09:30                                                                                                                                                                        
+Garbled time                                                                                                                                                                                                
+[student@desktop0 ~]$ at 09:30 2019-06-02 
+at> echo "start class day 6"> ~/start_class.txt                                                                                                                                                             
+at> <EOT>                                                                                                                                                                                                   
+job 2 at Sun Jun  2 09:30:00 2019  
+```
+
+当然也可以用平时改date时那个格式(只精确到日)
+```
+[student@desktop0 ~]$ at 2019-06-02 09:30
+syntax error. Last token seen: 09:30                                                                                                                                                                        
+Garbled time                                                                                                                                                                                                
+[student@desktop0 ~]$ at 09:30 2019-06-02 
+at> echo "start class day 6"> ~/start_class.txt                                                                                                                                                             
+at> <EOT>                                                                                                                                                                                                   
+job 2 at Sun Jun  2 09:30:00 2019  
+```
+
+
 - atq == at -l
 - at -c <number>
 - atrm
+
 
 
 ```bash
@@ -273,6 +326,46 @@ ctrl+z
 
 at 定时任务做一个定线..
 
+其实这些任务都可以在硬盘中看到
+```````````
+[student@desktop0 ~]$ at 2019-06-02 09:30
+syntax error. Last token seen: 09:30                                                                                                                                                                        
+Garbled time                                                                                                                                                                                                
+[student@desktop0 ~]$ at 09:30 2019-06-02 
+at> echo "start class day 6"> ~/start_class.txt                                                                                                                                                             
+at> <EOT>                                                                                                                                                                                                   
+job 2 at Sun Jun  2 09:30:00 2019  
+```````````
+
+man at是有下面一句
+````
+       The superuser may use these commands in any case.  
+       For other users, permission to use at is determined by the files 
+       /etc/at.allow and /etc/at.deny.  See at.allow(5) for details.
+````
+
+
+``````
+[student@desktop0 spool]$ sudo echo "student" >> /etc/at.deny
+-bash: /etc/at.deny: Permission denied
+[student@desktop0 spool]$ su - 
+Password: 
+[root@desktop0 ~]# echo "student" >> /etc/at.deny
+[root@desktop0 ~]# exit
+logout
+[student@desktop0 spool]$ at 2019-09-09
+You do not have permission to use at.
+[student@desktop0 spool]$ su - 
+Password: 
+Last login: �� 5�� 30 22:44:49 CST 2019 on pts/0
+[root@desktop0 ~]# echo "student" >> /etc/at.allow
+[root@desktop0 ~]# exit
+logout
+[student@desktop0 spool]$ at 2019-09-09
+at> <EOT>
+job 5 at Mon Sep  9 22:45:00 2019
+
+``````
 #### 利用at命令进行还原操作(以进行保险)
 
 ## 4.2 cron周而复始
@@ -281,12 +374,39 @@ at 定时任务做一个定线..
 - crontab -r 删除当前所有
 - crontab <filename> 以fiename内容替换
 
+### 如果是root用户可以用下面这个命令去编辑其它用户的定时作业
+`crontab -e -u student`
 
 ### 奇偶分钟开始
+````
+#odd second
+1-59/2
+
+#even second
+0-58/2
+````
 ### 分钟配成*的话,就会每分钟来一次
 ### 多个时间段可以用,分开
+````
+0,5,10
+0-10/5
+0-10/5,30
+````
 ### 天或周几是或的关系,其余都是和的关系
 
+```
+0 7  *  1-6 1-5
++
+0 7 1-20 1-6 *
+
+=
+0 7 1-20 1-6 1-5
+
+```
+
+### 同理,deney,allow都是还与at一样可以管理具体用户的
+
+### /var/spool/cron 下有具体的任务
 
 ## 4.3 系统cron作业
 - /etc/cron.hourly
@@ -294,6 +414,43 @@ at 定时任务做一个定线..
 - weekly
 - monthly
 
+```
+ls /etc/cron*
+/etc/cron.deny  /etc/crontab
+
+/etc/cron.d:
+0hourly  raid-check  sysstat  unbound-anchor
+
+/etc/cron.daily:
+0yum-daily.cron  logrotate  man-db.cron  mlocate  rhsmd
+
+/etc/cron.hourly:
+0anacron  0yum-hourly.cron
+
+/etc/cron.monthly:
+
+/etc/cron.weekly:
+
+```
+
+`````
+[root@desktop0 etc]# cat /etc/crontab
+SHELL=/bin/bash
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+MAILTO=root
+
+# For details see man 4 crontabs
+
+# Example of job definition:
+# .---------------- minute (0 - 59)
+# |  .------------- hour (0 - 23)
+# |  |  .---------- day of month (1 - 31)
+# |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...
+# |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat
+# |  |  |  |  |
+# *  *  *  *  * user-name  command to be executed
+
+`````
 
 有时会错过
 
