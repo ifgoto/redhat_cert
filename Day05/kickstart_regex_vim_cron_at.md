@@ -16,10 +16,16 @@ plan
 ## overview
 ![](res/kickstart_server_client_overview.png)
 ## step
+
 ## 1.1 弄出kickstart配置文件
+
 ## 1.2 发布配置文件(http,ftp....)
+
 ## 1.3 启动需要安装的机器并指向我们发布的地方
 
+## 1.4 扩展的官方参考
+
+[ANACONDA CUSTOMIZATION GUIDE](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/anaconda_customization_guide/index)
 
 # 2. 正则表达式
 

@@ -8,6 +8,93 @@ plan
 ### Linux进程调度和多任务
 
 #### 插一个nohup的演示
+
+```firefox &``` 这样运行后 ps 能看到当前firefox,把当前这个terminal关闭后, <br>
+firefox也会被关闭<br>
+当然,为了闭免这个问题, 我们可以用<br>
+`nohup firefox &`去运行.<br>
+
+`ps aux`
+a mean all 
+u mean user
+x mean extension
+
+当然也可以换成
+ps eux 会更详细
+
+当然上面的是bsd语法, 也可以用标准语法
+ps -ef
+
+
+
+```
+#也可以用下面的方法去取特定的列
+[kiosk@foundation0 ~]$ ps au
+USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root       797  0.5  0.5 207360 40124 tty1     Ssl+ 21:59   0:11 /usr/bin/Xorg :0 -background none -verbose -auth /run/gdm/auth-for-gdm-epzdFq/database -seat seat0 -nolisten tcp vt1
+kiosk     2282  0.0  0.0 116256  2840 pts/2    Ss+  22:21   0:00 bash
+kiosk     3062  0.5  0.0 116136  2796 pts/1    Ss   22:36   0:00 -bash
+kiosk     3120  0.0  0.0 123356  1368 pts/1    R+   22:36   0:00 ps au
+[kiosk@foundation0 ~]$ ps -o %cpu
+%CPU
+ 0.2
+ 0.0
+
+[kiosk@foundation0 ~]$ ps exf -o pid,%cpu,comm --no-header
+ 3060  0.0 sshd
+ 3062  0.0  \_ bash
+ 3151  0.0      \_ ps
+ 1058  0.0 gnome-session
+ 1154  0.0  \_ ssh-agent
+ 1276  0.0  \_ gnome-settings-
+ 1410  5.7  \_ gnome-shell
+ 1583  0.0  \_ seapplet
+ 1599  0.0  \_ tracker-miner-f
+ 1609  0.0  \_ rhsm-icon
+ 1618  0.0  \_ abrt-applet
+ 2203  0.1 gnome-terminal-
+ 2206  0.0  \_ gnome-pty-helpe
+ 2282  0.0  \_ bash
+ 1643  0.0 gvfsd-metadata
+ 1572  0.0 gvfsd-trash
+ 1555  0.0 tracker-store
+ 1550  0.0 gconfd-2
+ 1541  0.0 evolution-addre
+ 1537  0.0 evolution-calen
+ 1512  0.0 nautilus
+ 1479  0.0 evolution-sourc
+ 1473  0.0 mission-control
+ 1471  0.0 gnome-shell-cal
+ 1432  0.0 pulseaudio
+ 1420  0.0 gsd-printer
+ 1407  0.0 gvfs-gphoto2-vo
+ 1399  0.0 goa-daemon
+ 1396  0.0 gvfs-goa-volume
+ 1392  0.0 gvfs-mtp-volume
+ 1387  0.0 gvfs-afc-volume
+ 1377  0.0 gvfs-udisks2-vo
+ 1364  0.0 dconf-service
+ 1291  0.0 gnome-keyring-d
+ 1275  0.0 spice-vdagent
+ 1272  0.0 gvfsd-fuse
+ 1251  0.0 gvfsd
+ 1233  0.0 at-spi2-registr
+ 1221  0.0 at-spi-bus-laun
+ 1229  0.0  \_ dbus-daemon
+ 1143  0.0 dbus-daemon
+ 1107  0.0 dbus-launch
+
+```
+
+```
+也可以用下面的方法查找某个程序的pid
+[kiosk@foundation0 ~]$ pidof bash
+3062 2282 754
+[kiosk@foundation0 ~]$ man pidof
+[kiosk@foundation0 ~]$ echo $$
+3062
+```
+
 ```bash
 
 nice -n 13 firefox 2>&1 >/dev/null &
@@ -73,6 +160,11 @@ Currently, Linux supports the following "normal" (i.e., non-real-time) schedulin
 普通用户设置的nice值只能是正的,也就是nice值越来越大,也就是只能放弃自己的CPU...
 而只有root用户才可以把nice值设小那么才有可能真正地提高优先级
 
+其实初始优先级还是可以修改的(
+```
+chrt 1 cat /dev/zero >/dev/null
+```
+)
 
 ### 分时系统的一些说明
 就举个例子我们听音乐, 其实播放音乐的进程不用一直用着CPU只是需要在每隔一段时间用一下, 当然,这个时间比起我们正常人以0.1秒左右的感知说,
@@ -96,12 +188,28 @@ ps axo pid,comm,nice --sort=nice
 
 ```
 
+上面这些都是静态的, 我们可以用top去动态显示(当然还有图型界面那种)
 另外用top也是可以的,按r
+同时也可以按h演于一下各种功能
+
 
 
 ## 发现进程优先级实验
 用`lscpu`可以看到cpu的个数
 也可以用 `grep -c '^processor' /proc/cpuinfo`
+
+## 关闭某个cpu
+据说在
+`/sys/devices/system/cpu/cpu0`
+中加入offline文件从而关闭某个cpu
+与此相对的还有cpu亲和性设置
+
+## 利用top及renice可以看一下进程对cpu的占用
+cat /dev/zero > /dev/null &
+cat /dev/zero > /dev/null &
+
+renice -n 15 -p 1653
+
 
 这些实验及练习都很有必要做, 一个个去做吧 
 
@@ -167,6 +275,42 @@ total 4
 [user1@server0 ugo]$ logout
 
 ````
+### 常规演示
+`````
+[student@desktop0 ~]$ mkdir tmp2
+[student@desktop0 ~]$ getfacl tmp2                                                                                                                                                                          
+# file: tmp2
+# owner: student                                                                                                                                                                                            
+# group: student
+user::rwx                                                                                                                                                                                                   
+group::rwx
+other::r-x                                                                                                                                                                                                  
+
+[student@desktop0 ~]$ ls -ld tmp2                                                                                                                                                                           
+drwxrwxr-x. 2 student student 6 5��  31 23:09 tmp2
+[student@desktop0 ~]$ man setfacl                                                                                                                                                                           
+[student@desktop0 ~]$ sudo useradd u3
+[sudo] password for student: 
+[student@desktop0 ~]$ setfacl -m u:u3:rwx tmp2
+[student@desktop0 ~]$ ll
+total 20
+-rw-------. 1 root    root    8619 5��  29 22:10 anaconda-ks.cfg
+-rw-r--r--. 1 root    root    1981 5��  29 22:09 kickstart.cfg
+drwxrwxr-x. 2 student student   26 5��  29 23:02 tmp
+drwxrwxr-x+ 2 student student    6 5��  31 23:09 tmp2
+[student@desktop0 ~]$ getfacl tmp2
+# file: tmp2
+# owner: student
+# group: student
+user::rwx
+user:u3:rwx
+group::rwx
+mask::rwx
+other::r-x
+
+`````
+-m d 是默认权限
+-x d 是取消默认权限, 对已有的权限不受影响
 
 ### setfacl用了getfacl的输出
 ```bash
@@ -176,7 +320,13 @@ total 4
 ```
 
 
+
 ### 优先级的一个示例
+当给某个用户设置某个特定权限时, 他就不再属于other了,也不属于group,
+<br>
+但onwer例外, 还是可以走owner的路线
+<br>
+可以在/tmp/tmp2 加个文件abc测试一下, 加个用户u3
 
 
 
