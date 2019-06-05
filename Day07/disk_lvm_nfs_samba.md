@@ -260,6 +260,7 @@ mount: wrong fs type, bad option, bad superblock on /dev/mapper/ff-mylv,
 
 ```
 - xfs 只增不减, ext4可增可减
+- 同样扩展, xfs_grow 接的是挂载点,而resize2fs接的是具体设备
 ## 2.4 RAID
 - raid0
 - raid1
