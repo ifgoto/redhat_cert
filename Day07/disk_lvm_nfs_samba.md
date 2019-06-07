@@ -3,6 +3,8 @@
 # 1. 添加磁盘,分区及文件系统
 
 [Cylinder-head-sector](https://en.wikipedia.org/wiki/Cylinder-head-sector)
+或
+[硬盘基本知识（磁头、磁道、扇区、柱面）](https://www.cnblogs.com/jswang/p/9071847.html)
 
 ## 1.1 fdisk
 
@@ -201,6 +203,10 @@ I/O size (minimum/optimal): 512 bytes / 512 bytes
 
 ## 1.3 swap分区的挂载
 
+- 加入storage的扩充
+
+[swap](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html-single/storage_administration_guide/index#ch-swapspace)
+
 - 对于挂载的优先级说明
 man swapon搜-p
 man 2 swapon 
@@ -267,7 +273,11 @@ mount: wrong fs type, bad option, bad superblock on /dev/mapper/ff-mylv,
 
 有空可以说这个, 虽然考试不用考
 
-## 2.5 LVM 红帽官方文档
+## 2.5 /etc/lvm lvm2日志级别的修改.
+
+下面有配置文件,可以调整lvm的一些级别,之后就可以去看到我们对lvm的一些操作 .
+
+## 2.6 LVM 红帽官方文档
 [LVM 红帽官方文档](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/logical_volume_manager_administration/index)
 
 # 3. 利用NFS访问其它机器的存储
