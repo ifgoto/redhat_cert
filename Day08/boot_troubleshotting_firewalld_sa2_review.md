@@ -156,12 +156,15 @@ systemctl set-default XXX.target
 
 但有一个细节, 如果发现前面有`rhgb quiet` rd.break加入前, 请把上面的字眼删掉,以防万一,
 另外如不加入rd.break,那么可以加入 `init=/bin/sh`试一下,如果考试遇上失败的重置场景的话
-有时还不行的话再加入`console=tty1`
+有时还不行的话再加入`console=tty1`才加上rd.break.<br>
+
+![](res/add_console_tty1.png)<br>
 
 下面是一系列参考链接
-[RHEL 7 Root Password Recovery](https://access.redhat.com/discussions/1243493?tour=8)
-[12 Steps to Password Recovery for RHEL, CentOS 7 Linux](https://spr.com/password-recovery-for-rhel-centos-7-linux/)
-[How to recover forgotten root password](https://rhel7tutorial.wordpress.com/how-to-recover-forgotten-root-password/)
+<br>
+[RHEL 7 Root Password Recovery](https://access.redhat.com/discussions/1243493?tour=8)<br>
+[12 Steps to Password Recovery for RHEL, CentOS 7 Linux](https://spr.com/password-recovery-for-rhel-centos-7-linux/)<br>
+[How to recover forgotten root password](https://rhel7tutorial.wordpress.com/how-to-recover-forgotten-root-password/)<br>
 
 ### 1.5.2 给grub加密
 ```bash
@@ -250,12 +253,17 @@ To show all installed unit files use 'systemctl list-unit-files'.
 
 ## 1.8 再来一点猛的
 
+
 在server中
 ```bash
 #注意不是/dev/vda1
 dd if=/dev/zero bs=1 count=446 of=/dev/vda
 
 ```
+其实就是把MBR(主引导扇区给干掉)
+[MBR主引导扇区解析](https://www.cnblogs.com/CasonChan/p/4546658.html)<br>
+[主引导记录_百度百科](https://baike.baidu.com/item/%E4%B8%BB%E5%BC%95%E5%AF%BC%E8%AE%B0%E5%BD%95/7612638)<br>
+
 这样连grub菜单也被我们干掉了,这样开机时就没有选择了..这里我们需要挂载REHL7.0的iso进行troubleshotting中的rescue模式.
 
 可以的话演示一下chroot不然大家可能会有点晕
@@ -277,11 +285,12 @@ chroot /mnt/sysimage
 
 mount /dev/cdrom /mnt
 rpm -ivh /mnt/Pack*/ker*-3*.rpm --force
+#option 也可以 rpm -qp <filename.rpm> --script
 grub2-install /dev/vda
 
 grub2-mkconfig -o /boot/grub2/grub.cfg
 ````
-## 1.10 通过1.9,发现前面的都是浮云,只要有rescue盘..............
+## 1.10 通过1.9,发现前面的都是浮云,只要有rescue盘(我们也可以进去改密码)..............
 
 
 # 2.firewall 
