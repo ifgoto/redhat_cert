@@ -210,6 +210,8 @@ ip link set eth0 name eth1 <br>
 ch16   的总复习键入的是
 `lab sa1-review setup`  注意是数字1而不是字母l
 
+## wget -O 是大写的字母O而不是小写的,也不是字母0
+
 ## 在server或desktop中运行rht-vmctl命令
 这两个命令是在foundation0中运行的, 在这两个机器中运行会无效的.
 

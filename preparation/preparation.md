@@ -136,6 +136,90 @@ PS:这货对utf-8的中文支持得还行,但是对gb18030支持得不行.因此
 
 ## 常见问题(FAQ)
 
+### 如何让在我们的环境中快速重置desktop及server,并正常登陆
+```
+在foundation在
+ kiosk
+~/.bashrc加入以下命令
+alias resetall='rht-vmctl -q reset desktop && rht-vmctl -q reset server'
+
+alias sdsk='ssh -X student@172.25.0.10'
+alias rdsk='ssh -X root@172.25.0.10'
+
+alias ssrv='ssh -X student@172.25.0.11'
+alias rsrv='ssh -X root@172.25.0.11'
+
+
+```
+新增目录, 并把其设在PATH下面
+````
+mkdir -p ~/bin
+export PATH=$PATH:~/bin
+````
+在~/bin下面新增脚本cpall
+`````genericsql
+#!/usr/bin/expect
+spawn ssh-copy-id student@172.25.0.10
+set timeout 60
+
+expect {
+        "assword:" {
+                send "student\r"
+                exp_continue
+        }
+}
+
+spawn ssh-copy-id student@172.25.0.11
+set timeout 60
+expect {
+        "assword:" {
+                send "student\r"
+                exp_continue
+        }
+}
+
+spawn ssh-copy-id root@172.25.0.10
+set timeout 60
+expect {
+        "assword:" {
+                send "redhat\r"
+                exp_continue
+        }
+}
+
+spawn ssh-copy-id root@172.25.0.11
+set timeout 60
+expect {
+        "assword:" {
+                send "redhat\r"
+                exp_continue
+        }
+}
+
+exit
+`````
+
+修改/etc/hosts文件
+```
+add two lines
+172.25.0.10 dsk
+172.25.0.11 srv
+```
+
+之后只要在kiosk
+```
+resetall
+重置
+ping srv等ping通就
+cpall让我们免密登陆
+之后可以通过
+sdsk
+rdsk
+ssrv
+rsrv
+分别以student root登陆desktop 及 server
+```
+
 ### 有些对虚拟机(vmware workstation不太熟悉的同学)想我补充一下虚拟机的安装教程
 我只能贴一下链接, 尽可以找一个多图的,好一步步对着操作.<br>
 [windows安装虚拟机(VMware workstation)多图](https://blog.csdn.net/qq_35206244/article/details/79339453)

@@ -152,7 +152,8 @@ systemctl set-default XXX.target
 之前直接在内核中加空格, 加小写s(或数字1)进行单用户模式那招在rhel7已失效了
 
 可按书本上修改
-(如不remount,会发现/sysroot/etc/shadow下面是都没有权限的,)
+(如不remount,会发现/sysroot/etc/shado
+\w下面是都没有权限的,)
 
 但有一个细节, 如果发现前面有`rhgb quiet` rd.break加入前, 请把上面的字眼删掉,以防万一,
 另外如不加入rd.break,那么可以加入 `init=/bin/sh`试一下,如果考试遇上失败的重置场景的话
