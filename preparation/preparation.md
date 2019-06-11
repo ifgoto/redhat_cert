@@ -206,6 +206,11 @@ add two lines
 172.25.0.11 srv
 ```
 
+安装expect这个包 
+````
+yum install -y expect  
+````
+
 之后只要在kiosk
 ```
 resetall
