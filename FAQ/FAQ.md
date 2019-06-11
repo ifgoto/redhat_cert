@@ -300,7 +300,7 @@ rm: remove write-protected regular empty file ‘lfile2’? y
 
 ```
 
-## 有同学问题用fdisk进行分区时, 不设置分区类型,也能正常地进行,这个是为什么?
+## 有同学问到, 用fdisk进行分区时, 不设置分区类型,也能正常地进行,这个是为什么?
 如下图,这个设置的类型对应MBR中的分区信息的分区类型, 
 ![](res/MBR.png)<br>
 ![](res/MBR_Partition_type.png)<br>
