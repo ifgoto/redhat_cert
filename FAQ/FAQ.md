@@ -308,7 +308,7 @@ rm: remove write-protected regular empty file ‘lfile2’? y
 如果我们不认真设置该分区类型有些场景上是可以的, 如用83(linux)进行lvm的pvcreate也不会报错.
 但有些场景这个值是有用的..
 具体可以看下面的链接, 说明了lvm是不管这个的, 但内核某些场景还是有用的.<br>
-![Is the fdisk partition type important when using lvm](https://serverfault.com/questions/306419/is-the-fdisk-partition-type-important-when-using-lvm)
+[Is the fdisk partition type important when using lvm](https://serverfault.com/questions/306419/is-the-fdisk-partition-type-important-when-using-lvm)
 
 
 
