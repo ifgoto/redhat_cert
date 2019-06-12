@@ -300,6 +300,18 @@ rm: remove write-protected regular empty file ‘lfile2’? y
 
 ```
 
+## 有同学问到, 用fdisk进行分区时, 不设置分区类型,也能正常地进行,这个是为什么?
+如下图,这个设置的类型对应MBR中的分区信息的分区类型, 
+![](res/MBR.png)<br>
+![](res/MBR_Partition_type.png)<br>
+
+如果我们不认真设置该分区类型有些场景上是可以的, 如用83(linux)进行lvm的pvcreate也不会报错.
+但有些场景这个值是有用的..
+具体可以看下面的链接, 说明了lvm是不管这个的, 但内核某些场景还是有用的.<br>
+[Is the fdisk partition type important when using lvm](https://serverfault.com/questions/306419/is-the-fdisk-partition-type-important-when-using-lvm)
+
+
+
 ## RH134总复习中, 第4步的第4个小点(mount -a后报错问题解决方法)
 
 ### 问题描述 
