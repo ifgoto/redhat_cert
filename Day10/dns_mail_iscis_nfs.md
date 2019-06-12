@@ -25,6 +25,16 @@ echo "127.0.0.1" >> /etc/hosts
 /etc/nsswitch.conf中的
 host: files dns的先后顺序,观察ping classroom的变化
 
+-------------<br>
+用tcpdump抓包排查
+on server 
+`tcpdump -i eth0  host 172.25.0.11 and host 172.25.0.10`<br>
+
+
+再配合<br>
+`dig @server0.example.com A desktop0.example.com`
+
+
 ## 1.4 时间允许的话可以说说DHCP
 
 
