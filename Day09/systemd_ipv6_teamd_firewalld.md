@@ -9,7 +9,8 @@
 ## systemd的历史
 
 可参考下面这些链接
-[LINUX PID 1 和 SYSTEMD](https://coolshell.cn/articles/17998.html)
+[LINUX PID 1 和 SYSTEMD](https://coolshell.cn/articles/17998.html)<br>
+
 
 ## 同时,也讲述一下一般我们遇到一个新事物的一个可能有用到的认知方式
 
@@ -18,6 +19,13 @@
 systemd wiki
 之后再找 Official website , Systemd on Github
 之类,可以对这事有一个系统的认识.
+
+## 拓展知识汇总
+从github过去的(<br>
+当然,有空的话也可以介绍一下github这个全球最大的同性交友网友,,也被称为gayhub, <br>
+当然, 这里对LGBT没有任何歧视,LGBT是什么,好吧.说好零基础的..)
+[systemd官网](https://www.freedesktop.org/wiki/Software/systemd/)<br>
+[systemd攻略 ](https://www.jianshu.com/p/8b3fba13fcad)<br>
 
 ## 当系统启动完后 echo $$可以看到当前bash进程的pid(遇小代表着从开始到现在这个bash用了多少个进程)
 
@@ -180,6 +188,269 @@ Mar 11 10:49:57 desktop0.example.com systemd[1]: Started LVM2 metadata daemon.
 ```
 ### 操作小技巧
 此时也可以说一下, 如果平时我们终端软件支持鼠标滚轮缩放,那么如果有时我们复制的东西超过一屏,可以先缩小再复制.
+
+## 一些零碎的小复习
+### rescue mode 对应的数字高还是 emergency高
+````
+      systemctl list-dependencies emergency.target 
+      systemctl list-dependencies rescue.target 
+
+````
+### systemctl restart 与 try-restart的区别
+
+`````
+   systemctl status httpd
+   yum install -y httpd
+   systemctl status httpd
+   systemctl try-restart httpd
+   systemctl status httpd
+   systemctl restart httpd
+   systemctl status httpd
+   systemctl stop httpd
+   systemctl status httpd
+   systemctl try-restart httpd
+   systemctl status httpd
+   systemctl start httpd
+   systemctl status httpd
+   systemctl try-restart httpd
+   systemctl status httpd
+`````
+## 我们自己动手写个services
+
+### 例如,据说女人昏了头的时候, 就会要求结婚,我们就先写个结婚service
+
+到`/usr/lib/systemd/system`,看到一系列的服务, 我们就找个老熟人sshd.service来作个模板...<br>
+其实这里也可以多个心眼, 现在我们一般需要找一个比较简单的来进行,这时我们可以活学活用<br>
+`ls -lS *.services` 这样来列一下,文件比较小的进行copy,<br>
+好吧. 还是sshd吧...<br>
+
+
+`cp sshd.service marryd.service`
+
+``````
+#cat marryd.service
+[root@server0 system]# cat marryd.service 
+[Unit]
+Description=get marry server daemon
+#After=syslog.target network.target auditd.service
+
+[Service]
+#EnvironmentFile=/etc/sysconfig/sshd
+#ExecStartPre=/usr/sbin/sshd-keygen
+ExecStart=/root/get_marry
+#ExecReload=/bin/kill -HUP $MAINPID
+#KillMode=process
+#Restart=on-failure
+#RestartSec=42s
+
+[Install]
+#WantedBy=multi-user.target
+``````
+
+由于执行需要`/root/get_marry`<br>
+于是就自己手动加个脚本, 再为了证明这个脚本曾经,并一直活着.就让其死循环,一直打印点什么到某个文件中去 ..<br>
+
+````
+cat /root/get_marry
+#[root@server0 system]# cat /root/get_marry 
+#!/bin/bash
+
+while true
+do
+	date >>/root/marry.out;
+	echo "yi bai tian di" >> /root/marry.out;
+	sleep 5;
+done
+
+````
+
+写完后,再测试一波<br>
+
+
+````
+systemctl status marryd
+systemctl restart marryd
+systemctl status marryd
+
+````
+
+另一个终端介绍下(tailf这个命令, 也就是tail -f少写了两个字符)<br>
+
+````
+tailf /root/marry.out
+````
+
+至此,,,结婚这个服务就完成了<br>
+
+## 且慢...丈母娘说, 结婚没有房怎么行...我儿女昏了头,我可没有...
+
+于是....我们得出一个结论,,,买房这个service是marryd这个服务的强依赖服务.<br>
+
+所以我们要像之前那样写个housed.services,之后再让marry这个服务作为强依赖拉起.<br>
+
+有时我们改了/usr/lib/systemd/system/里面的文件, 在`sytemctl status XXX`时会提示我们reload,如下面的字眼<br>
+
+`````
+....
+Warning: Unit file changed on disk, 'systemctl daemon-reload' recommended.
+......
+`````
+
+之后在marryd.service的[UNIT] 中加入 `Requires=housed.service` 表示结婚前先买房....
+修改完之后,`systemctl status housed`确认未拉起, 直接拉起marryd发现会把housed拉起, <br>
+当然, 我们也可以从 <br>
+`````
+[root@server0 system]# systemctl list-dependencies marryd|head -n3
+marryd.service
+├─housed.service
+├─system.slice
+`````
+这个输出中看到
+
+当然我们也可以一直`tailf /root/marry.out`查看结果也能证实这一点.
+
+## 再慢....老丈人说,,,要有车,男人才有面子....
+这时准备去买,结果丈母娘 眉头 动了一下,,,,老丈人就....<br>
+看来车子不是必须的..所以我只是在marryd.service [UNIT] 中加入了
+`Wants=card.service `
+表示弱依赖,,,也就是list-dependencies也能显示marryd 与card有关...<br>
+start marryd时,也会把card拉起,但stop card时, marryd也存在;<br>
+但是如果stop housed时, marryd也会停止<br>
+这时大家就可以看出强依赖与弱依赖的关系.
+
+
+##  结婚时一般都要早生贵子
+所以我们在marryd.service的[UNIT]中加入<br>
+`After=baby.service` 但值得注意的, 只有Wants,与 Requires是有依赖关系. 而afters是没有的,只是说明个先后顺序的,,,<br>
+现实中也有不少奉子成婚,结婚洒与满月酒一起摆的,,省了不少事..<br>
+可以list-dependencies 及只拉起marryd,会发现baby没有运行
+而且我们把baby.service弄成个`[Service] Type=oneshot`,只让其运行一次, (也就是计划生育),运行完后, <br>
+发现status为 static
+```````
+[root@server0 system]# systemctl status baby
+baby.service - make a baby after marry
+   Loaded: loaded (/usr/lib/systemd/system/baby.service; static)
+   Active: inactive (dead) since 六 2019-06-15 01:45:45 CST; 2min 51s ago
+  Process: 8639 ExecStart=/root/make_baby (code=exited, status=0/SUCCESS)
+ Main PID: 8639 (code=exited, status=0/SUCCESS)
+
+6月 15 01:45:45 server0.example.com systemd[1]: Starting make a baby after marry...
+6月 15 01:45:45 server0.example.com systemd[1]: Started make a baby after marry.
+```````
+
+## summary
+
+### service
+
+`````
+[root@server0 system]# cat housed.service  card.service marryd.service baby.service 
+[Unit]
+Description=my mother in law need a house before get marry
+#After=syslog.target network.target auditd.service
+
+[Service]
+#EnvironmentFile=/etc/sysconfig/sshd
+ExecStartPre=/usr/sbin/sshd-keygen
+ExecStart=/root/buy_house
+#ExecReload=/bin/kill -HUP $MAINPID
+#KillMode=process
+#Restart=on-failure
+#RestartSec=42s
+
+[Install]
+#WantedBy=multi-user.target
+[Unit]
+Description=my father in law need a house before get marry
+#After=syslog.target network.target auditd.service
+
+[Service]
+#EnvironmentFile=/etc/sysconfig/sshd
+#ExecStartPre=/usr/sbin/sshd-keygen
+ExecStart=/root/buy_car
+#ExecReload=/bin/kill -HUP $MAINPID
+#KillMode=process
+#Restart=on-failure
+#RestartSec=42s
+
+[Install]
+#WantedBy=multi-user.target
+[Unit]
+Description=get marry server daemon
+Requires=housed.service
+Wants=card.service
+After=baby.service
+
+[Service]
+#EnvironmentFile=/etc/sysconfig/sshd
+#ExecStartPre=/usr/sbin/sshd-keygen
+ExecStart=/root/get_marry
+#ExecReload=/bin/kill -HUP $MAINPID
+#KillMode=process
+#Restart=on-failure
+#RestartSec=42s
+
+[Install]
+#WantedBy=multi-user.target
+[Unit]
+Description=make a baby after marry
+#After=syslog.target network.target auditd.service
+
+[Service]
+Type=oneshot
+#EnvironmentFile=/etc/sysconfig/sshd
+#ExecStartPre=/usr/sbin/sshd-keygen
+ExecStart=/root/make_baby
+#ExecReload=/bin/kill -HUP $MAINPID
+#KillMode=process
+#Restart=on-failure
+#RestartSec=42s
+
+[Install]
+#WantedBy=multi-user.target
+
+
+`````
+
+### script
+``````
+cd /root/
+[root@server0 ~]# cat get_marry buy_house buy_car make_baby 
+#!/bin/bash
+
+while true
+do
+	date >>/root/marry.out;
+	echo "yi bai tian di" >> /root/marry.out;
+	sleep 5;
+done
+#!/bin/bash
+
+while true
+do
+	date >>/root/marry.out;
+	echo "buy a house" >> /root/marry.out;
+	sleep 1;
+done
+#!/bin/bash
+
+while true
+do
+	date >>/root/marry.out;
+	echo "buy a car" >> /root/marry.out;
+	sleep 2;
+done
+#!/bin/bash
+
+	date >>/root/marry.out;
+	echo "make a baby" >> /root/marry.out;
+
+
+
+``````
+
+当然. 这边只是举例, 更多的 外遇模式,等各种特殊服务自行脑补,并手动实践一下...
+
+
 
 ## systemctl命令摘要
 ![](res/systemctl_sumary.png)
