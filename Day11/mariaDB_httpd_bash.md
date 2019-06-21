@@ -10,17 +10,47 @@
 
 此处有时间可以简单介绍一下数据库的演进.
 从文件到数据库的历程
+[数据库概述](https://blog.csdn.net/fly_zhyu/article/details/75336758)<br>
+[Database wiki](https://en.wikipedia.org/wiki/Database)
 
 ### mariaDB与mysql的口水战
 ![](res/mariaDBvsMysql.png)
 
-[ranking](https://db-engines.com/en/ranking)
+[ranking](https://db-engines.com/en/ranking)<br>
 
-[浅谈MySQL和MariaDB区别?](https://blog.csdn.net/qq_37187976/article/details/79117863)
-[为什么 Oracle 收购 MySQL 后仍保证其开源免费？](https://www.zhihu.com/question/49381733)
-[兼容性列表](https://mariadb.com/kb/en/library/mariadb-vs-mysql-compatibility/)
+[浅谈MySQL和MariaDB区别?](https://blog.csdn.net/qq_37187976/article/details/79117863)<br>
+[为什么 Oracle 收购 MySQL 后仍保证其开源免费？](https://www.zhihu.com/question/49381733)<br>
+[兼容性列表](https://mariadb.com/kb/en/library/mariadb-vs-mysql-compatibility/)<br>
 
 ### 安装
+
+默认情况下, rhel只提供mariadb, <br>
+下面大家可以看到默认情况下两个包还是相差挺多内容的
+
+``````
+[root@server0 ~]# yum list mariadb*
+Loaded plugins: langpacks
+Installed Packages
+mariadb-libs.x86_64                                                                                  1:5.5.35-3.el7                                                                                installed
+Available Packages
+mariadb.x86_64                                                                                       1:5.5.35-3.el7                                                                                rhel_dvd 
+mariadb-bench.x86_64                                                                                 1:5.5.35-3.el7                                                                                rhel_dvd 
+mariadb-devel.i686                                                                                   1:5.5.35-3.el7                                                                                rhel_dvd 
+mariadb-devel.x86_64                                                                                 1:5.5.35-3.el7                                                                                rhel_dvd 
+mariadb-libs.i686                                                                                    1:5.5.35-3.el7                                                                                rhel_dvd 
+mariadb-server.x86_64                                                                                1:5.5.35-3.el7                                                                                rhel_dvd 
+mariadb-test.x86_64                                                                                  1:5.5.35-3.el7                                                                                rhel_dvd 
+[root@server0 ~]# yum list mysql*
+Loaded plugins: langpacks
+Available Packages
+MySQL-python.x86_64                                                                                     1.2.3-11.el7                                                                                rhel_dvd
+mysql-connector-java.noarch                                                                             1:5.1.25-3.el7                                                                              rhel_dvd
+mysql-connector-odbc.x86_64              
+
+``````
+
+
+
 ````bash
 yum -y groups install mariadb mariadb-client
 
@@ -50,6 +80,12 @@ Mar 17 00:33:41 server0.example.com systemd[1]: Started MariaDB database server.
 
 ````
 
+并查看侦听<br>
+
+`````
+[root@server0 ~]# ss -tnlp|grep 3306
+LISTEN     0      50                        *:3306                     *:*      users:(("mysqld",30262,13))
+`````
 ### 根据不同的情况讲述一下,本地访问及远程访问两种模式的差别,及各自的应用场景
 其实也可能 补充一下replication/cluster等不同的场景
 
@@ -124,9 +160,12 @@ user_name@host_name
 全局, 库,表,列,其它
 
 
-另外, 改完一定要记得
-FLUSH PRIVILEGES(是不是有点像写完分区表后要 partprobe通知内核分区表已修改了)
-这里好像只有大写才会有补全...小写补不了..
+另外, 改完一定要记得<br>
+FLUSH PRIVILEGES(是不是有点像写完分区表后要 partprobe通知内核分区表已修改了)<br>
+这里好像只有大写才会有补全...小写补不了..<br>
+当然, 我们要连到某个库才有相应的补全, (也就是我们要use 某个database,之后才可能补全表名及相应的命令)<br>
+不然好像没有...<br>
+
 
 
 [grant](https://mariadb.com/kb/en/library/grant/)
