@@ -350,9 +350,13 @@ Jun 30 12:03:40 server0.example.com avahi-daemon[479]: Registering new address r
 解决详见:
 [启动网卡报错（Failed to start LSB: Bring up/down networking ）解决办法总结](https://blog.51cto.com/11863547/1905929)
 
+<br>
+
 或下面两个链接更详细
 [CentOS7 Failed to start LSB: Bring up/down networking. 已解决！！！](https://www.cnblogs.com/zyw-205520/p/5328887.html)
+<br>
 [三种方法解决 Failed to start LSB: Bring up/down networking 问题](https://blog.csdn.net/qq_21398167/article/details/46694179)
+<br>
 
 
 ```
