@@ -1,0 +1,750 @@
+     ©°©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©´
+     ©¦                        ? MobaXterm 10.4 ?                          ©¦
+     ©¦            (SSH client, X-server and networking tools)             ©¦
+     ©¦                                                                    ©¦
+     ©¦ ? SSH session to kiosk@192.168.11.2                                ©¦
+     ©¦   ? SSH compression : ?                                            ©¦
+     ©¦   ? SSH-browser     : ?                                            ©¦
+     ©¦   ? X11-forwarding  : ?  (remote display is forwarded through SSH) ©¦
+     ©¦   ? DISPLAY         : ?  (automatically set on remote server)      ©¦
+     ©¦                                                                    ©¦
+     ©¦ ? For more info, ctrl+click on help or visit our website           ©¦
+     ©¸©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¼
+
+Last login: Sun Jun 30 11:17:55 2019 from 192.168.11.1
+[kiosk@foundation0 ~]$ rsrv
+/usr/bin/xauth:  file /root/.Xauthority does not exist
+[root@server0 ~]#
+[root@server0 ~]# lab teambridge setup
+Setting up for link aggregation lab ... SUCCESS
+[root@server0 ~]# ip link
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP mode DEFAULT qlen 1000
+    link/ether 52:54:00:00:00:0b brd ff:ff:ff:ff:ff:ff
+4: eno1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP mode DEFAULT qlen 1000
+    link/ether 52:64:e4:27:1f:9f brd ff:ff:ff:ff:ff:ff
+6: eno2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP mode DEFAULT qlen 1000
+    link/ether 66:2c:86:5a:eb:8b brd ff:ff:ff:ff:ff:ff
+[root@server0 ~]# nmcli con add  type team con-name team0 ifname team0 config '{"runner":{"name":"activebackup"}}'
+Connection 'team0' (15ec1645-1af4-457c-84ce-e97c3e1ff531) successfully added.
+[root@server0 ~]# nmcli con add type team
+team        team-slave
+[root@server0 ~]# nmcli con add type team
+team        team-slave
+[root@server0 ~]# nmcli con add type team-slave con-name team0-port1 ifname eno1 master team0
+Connection 'team0-port1' (81a6fbbe-1bfc-4378-bd28-f532a0e7cf80) successfully added.
+[root@server0 ~]# nmcli con add type team-slave con-name team0-port2 ifname eno2 master team0
+Connection 'team0-port2' (f46bab88-8888-4a62-94e6-53b7977ace7e) successfully added.
+[root@server0 ~]# teamdctl team0 state
+setup:
+  runner: activebackup
+ports:
+  eno1
+    link watches:
+      link summary: up
+      instance[link_watch_0]:
+        name: ethtool
+        link: up
+  eno2
+    link watches:
+      link summary: up
+      instance[link_watch_0]:
+        name: ethtool
+        link: up
+runner:
+  active port: eno1
+[root@server0 ~]# nmcli dev dis team0
+[root@server0 ~]# systemctl stop NetworkManager
+[root@server0 ~]# systemctl disable  NetworkManager
+rm '/etc/systemd/system/multi-user.target.wants/NetworkManager.service'
+rm '/etc/systemd/system/dbus-org.freedesktop.NetworkManager.service'
+rm '/etc/systemd/system/dbus-org.freedesktop.nm-dispatcher.service'
+[root@server0 ~]# cd /etc/sysconfig/network-scripts/
+[root@server0 network-scripts]# ls
+ifcfg-eth0   ifcfg-team0-port1  ifdown-bnep  ifdown-ipv6  ifdown-ppp     ifdown-Team      ifup          ifup-eth   ifup-isdn   ifup-post    ifup-sit       ifup-tunnel       network-functions
+ifcfg-lo     ifcfg-team0-port2  ifdown-eth   ifdown-isdn  ifdown-routes  ifdown-TeamPort  ifup-aliases  ifup-ippp  ifup-plip   ifup-ppp     ifup-Team      ifup-wireless     network-functions-ipv6
+ifcfg-team0  ifdown             ifdown-ippp  ifdown-post  ifdown-sit     ifdown-tunnel    ifup-bnep     ifup-ipv6  ifup-plusb  ifup-routes  ifup-TeamPort  init.ipv6-global
+[root@server0 network-scripts]# vim ifcfg-team0
+[root@server0 network-scripts]# cat ifcfg-team0
+DEVICE=team0
+TEAM_CONFIG="{\"runner\":{\"name\":\"activebackup\"}}"
+DEVICETYPE=Team
+BOOTPROTO=dhcp
+DEFROUTE=yes
+PEERDNS=yes
+PEERROUTES=yes
+IPV4_FAILURE_FATAL=no
+IPV6INIT=yes
+IPV6_AUTOCONF=yes
+IPV6_DEFROUTE=yes
+IPV6_PEERDNS=yes
+IPV6_PEERROUTES=yes
+IPV6_FAILURE_FATAL=no
+NAME=team0
+UUID=15ec1645-1af4-457c-84ce-e97c3e1ff531
+ONBOOT=yes
+BRIDGE=brteam0
+BRIDGE=brteam0
+[root@server0 network-scripts]# vim ifcfg-team0
+ifcfg-team0        ifcfg-team0-port1  ifcfg-team0-port2
+[root@server0 network-scripts]# vim ifcfg-team0
+ifcfg-team0        ifcfg-team0-port1  ifcfg-team0-port2
+[root@server0 network-scripts]# vim ifcfg-team0-port1
+[root@server0 network-scripts]# cat ifcfg-team0-port1
+NAME=team0-port1
+UUID=81a6fbbe-1bfc-4378-bd28-f532a0e7cf80
+DEVICE=eno1
+ONBOOT=yes
+TEAM_MASTER=team0
+DEVICETYPE=TeamPort
+[root@server0 network-scripts]# vim ifcfg-team0-port2
+[root@server0 network-scripts]# cat ifcfg-team0-port2
+NAME=team0-port2
+UUID=f46bab88-8888-4a62-94e6-53b7977ace7e
+DEVICE=eno2
+ONBOOT=yes
+TEAM_MASTER=team0
+DEVICETYPE=TeamPort
+[root@server0 network-scripts]# systemctl restart network
+Job for network.service failed. See 'systemctl status network.service' and 'journalctl -xn' for details.
+[root@server0 network-scripts]# vim ifcfg-brteam0
+[root@server0 network-scripts]# systemctl restart network
+Job for network.service failed. See 'systemctl status network.service' and 'journalctl -xn' for details.
+[root@server0 network-scripts]# systemctl status -l network
+network.service - LSB: Bring up/down networking
+   Loaded: loaded (/etc/rc.d/init.d/network)
+   Active: failed (Result: exit-code) since Sun 2019-06-30 12:01:20 CST; 14s ago
+  Process: 3027 ExecStop=/etc/rc.d/init.d/network stop (code=exited, status=0/SUCCESS)
+  Process: 3641 ExecStart=/etc/rc.d/init.d/network start (code=exited, status=1/FAILURE)
+
+Jun 30 12:01:20 server0.example.com network[3641]: RTNETLINK answers: File exists
+Jun 30 12:01:20 server0.example.com network[3641]: RTNETLINK answers: File exists
+Jun 30 12:01:20 server0.example.com network[3641]: RTNETLINK answers: File exists
+Jun 30 12:01:20 server0.example.com network[3641]: RTNETLINK answers: File exists
+Jun 30 12:01:20 server0.example.com network[3641]: RTNETLINK answers: File exists
+Jun 30 12:01:20 server0.example.com network[3641]: RTNETLINK answers: File exists
+Jun 30 12:01:20 server0.example.com network[3641]: RTNETLINK answers: File exists
+Jun 30 12:01:20 server0.example.com systemd[1]: network.service: control process exited, code=exited status=1
+Jun 30 12:01:20 server0.example.com systemd[1]: Failed to start LSB: Bring up/down networking.
+Jun 30 12:01:20 server0.example.com systemd[1]: Unit network.service entered failed state.
+[root@server0 network-scripts]# journalctl -xn
+-- Logs begin at Sun 2019-06-30 11:19:26 CST, end at Sun 2019-06-30 12:01:20 CST. --
+Jun 30 12:01:20 server0.example.com dbus-daemon[523]: dbus[523]: [system] Activating via systemd: service name='org.freedesktop.nm_dispatcher' unit='dbus-org.freedesktop.nm-dispatcher.service'
+Jun 30 12:01:20 server0.example.com dbus-daemon[523]: dbus[523]: [system] Activation via systemd failed for unit 'dbus-org.freedesktop.nm-dispatcher.service': Unit dbus-org.freedesktop.nm-dispatcher
+Jun 30 12:01:20 server0.example.com dbus[523]: [system] Activation via systemd failed for unit 'dbus-org.freedesktop.nm-dispatcher.service': Unit dbus-org.freedesktop.nm-dispatcher.service failed to
+Jun 30 12:01:20 server0.example.com NetworkManager[2727]: <warn> Dispatcher failed: (32) Unit dbus-org.freedesktop.nm-dispatcher.service failed to load: No such file or directory.
+Jun 30 12:01:20 server0.example.com network[3641]: RTNETLINK answers: File exists
+Jun 30 12:01:20 server0.example.com network[3641]: RTNETLINK answers: File exists
+Jun 30 12:01:20 server0.example.com network[3641]: RTNETLINK answers: File exists
+Jun 30 12:01:20 server0.example.com systemd[1]: network.service: control process exited, code=exited status=1
+Jun 30 12:01:20 server0.example.com systemd[1]: Failed to start LSB: Bring up/down networking.
+-- Subject: Unit network.service has failed
+-- Defined-By: systemd
+-- Support: http://lists.freedesktop.org/mailman/listinfo/systemd-devel
+--
+-- Unit network.service has failed.
+--
+-- The result is failed.
+Jun 30 12:01:20 server0.example.com systemd[1]: Unit network.service entered failed state.
+[root@server0 network-scripts]# cat ifcfg-team0-port1
+NAME=team0-port1
+UUID=81a6fbbe-1bfc-4378-bd28-f532a0e7cf80
+DEVICE=eno1
+ONBOOT=yes
+TEAM_MASTER=team0
+DEVICETYPE=TeamPort
+[root@server0 network-scripts]# cat ifcfg-team0-port2
+NAME=team0-port2
+UUID=f46bab88-8888-4a62-94e6-53b7977ace7e
+DEVICE=eno2
+ONBOOT=yes
+TEAM_MASTER=team0
+DEVICETYPE=TeamPort
+[root@server0 network-scripts]# cat ifcfg-team0
+DEVICE=team0
+TEAM_CONFIG="{\"runner\":{\"name\":\"activebackup\"}}"
+DEVICETYPE=Team
+BOOTPROTO=dhcp
+DEFROUTE=yes
+PEERDNS=yes
+PEERROUTES=yes
+IPV4_FAILURE_FATAL=no
+IPV6INIT=yes
+IPV6_AUTOCONF=yes
+IPV6_DEFROUTE=yes
+IPV6_PEERDNS=yes
+IPV6_PEERROUTES=yes
+IPV6_FAILURE_FATAL=no
+NAME=team0
+UUID=15ec1645-1af4-457c-84ce-e97c3e1ff531
+ONBOOT=yes
+BRIDGE=brteam0
+BRIDGE=brteam0
+[root@server0 network-scripts]# cat ifcfg-brteam0
+DEVICE=brteam0
+ONBOOT=yes
+TYPE=Bridge
+IPADDR0=192.168.0.100
+PREFIX0=24
+[root@server0 network-scripts]# vim ifcfg-team0
+[root@server0 network-scripts]# cat ifcfg-team0
+DEVICE=team0
+TEAM_CONFIG="{\"runner\":{\"name\":\"activebackup\"}}"
+DEVICETYPE=Team
+BOOTPROTO=dhcp
+DEFROUTE=yes
+PEERDNS=yes
+PEERROUTES=yes
+IPV4_FAILURE_FATAL=no
+IPV6INIT=yes
+IPV6_AUTOCONF=yes
+IPV6_DEFROUTE=yes
+IPV6_PEERDNS=yes
+IPV6_PEERROUTES=yes
+IPV6_FAILURE_FATAL=no
+NAME=team0
+UUID=15ec1645-1af4-457c-84ce-e97c3e1ff531
+ONBOOT=yes
+BRIDGE=brteam0
+[root@server0 network-scripts]# systemctl restart network
+
+Job for network.service failed. See 'systemctl status network.service' and 'journalctl -xn' for details.
+[root@server0 network-scripts]#
+[root@server0 network-scripts]#
+[root@server0 network-scripts]# systemctl status -l network
+network.service - LSB: Bring up/down networking
+   Loaded: loaded (/etc/rc.d/init.d/network)
+   Active: failed (Result: exit-code) since Sun 2019-06-30 12:03:39 CST; 9s ago
+  Process: 3027 ExecStop=/etc/rc.d/init.d/network stop (code=exited, status=0/SUCCESS)
+  Process: 3957 ExecStart=/etc/rc.d/init.d/network start (code=exited, status=1/FAILURE)
+
+Jun 30 12:03:39 server0.example.com network[3957]: RTNETLINK answers: File exists
+Jun 30 12:03:39 server0.example.com network[3957]: RTNETLINK answers: File exists
+Jun 30 12:03:39 server0.example.com network[3957]: RTNETLINK answers: File exists
+Jun 30 12:03:39 server0.example.com network[3957]: RTNETLINK answers: File exists
+Jun 30 12:03:39 server0.example.com network[3957]: RTNETLINK answers: File exists
+Jun 30 12:03:39 server0.example.com network[3957]: RTNETLINK answers: File exists
+Jun 30 12:03:39 server0.example.com network[3957]: RTNETLINK answers: File exists
+Jun 30 12:03:39 server0.example.com systemd[1]: network.service: control process exited, code=exited status=1
+Jun 30 12:03:39 server0.example.com systemd[1]: Failed to start LSB: Bring up/down networking.
+Jun 30 12:03:39 server0.example.com systemd[1]: Unit network.service entered failed state.
+[root@server0 network-scripts]# systemctl status network.service
+network.service - LSB: Bring up/down networking
+   Loaded: loaded (/etc/rc.d/init.d/network)
+   Active: failed (Result: exit-code) since Sun 2019-06-30 12:03:39 CST; 42s ago
+  Process: 3027 ExecStop=/etc/rc.d/init.d/network stop (code=exited, status=0/SUCCESS)
+  Process: 3957 ExecStart=/etc/rc.d/init.d/network start (code=exited, status=1/FAILURE)
+
+Jun 30 12:03:39 server0.example.com network[3957]: RTNETLINK answers: File exists
+Jun 30 12:03:39 server0.example.com network[3957]: RTNETLINK answers: File exists
+Jun 30 12:03:39 server0.example.com network[3957]: RTNETLINK answers: File exists
+Jun 30 12:03:39 server0.example.com network[3957]: RTNETLINK answers: File exists
+Jun 30 12:03:39 server0.example.com network[3957]: RTNETLINK answers: File exists
+Jun 30 12:03:39 server0.example.com network[3957]: RTNETLINK answers: File exists
+Jun 30 12:03:39 server0.example.com network[3957]: RTNETLINK answers: File exists
+Jun 30 12:03:39 server0.example.com systemd[1]: network.service: control process exited, code=exited status=1
+Jun 30 12:03:39 server0.example.com systemd[1]: Failed to start LSB: Bring up/down networking.
+Jun 30 12:03:39 server0.example.com systemd[1]: Unit network.service entered failed state.
+[root@server0 network-scripts]# journalctl -xn
+-- Logs begin at Sun 2019-06-30 11:19:26 CST, end at Sun 2019-06-30 12:03:40 CST. --
+Jun 30 12:03:39 server0.example.com network[3957]: RTNETLINK answers: File exists
+Jun 30 12:03:39 server0.example.com network[3957]: RTNETLINK answers: File exists
+Jun 30 12:03:39 server0.example.com network[3957]: RTNETLINK answers: File exists
+Jun 30 12:03:39 server0.example.com network[3957]: RTNETLINK answers: File exists
+Jun 30 12:03:39 server0.example.com network[3957]: RTNETLINK answers: File exists
+Jun 30 12:03:39 server0.example.com network[3957]: RTNETLINK answers: File exists
+Jun 30 12:03:39 server0.example.com systemd[1]: network.service: control process exited, code=exited status=1
+Jun 30 12:03:39 server0.example.com systemd[1]: Failed to start LSB: Bring up/down networking.
+-- Subject: Unit network.service has failed
+-- Defined-By: systemd
+-- Support: http://lists.freedesktop.org/mailman/listinfo/systemd-devel
+--
+-- Unit network.service has failed.
+--
+-- The result is failed.
+Jun 30 12:03:39 server0.example.com systemd[1]: Unit network.service entered failed state.
+Jun 30 12:03:40 server0.example.com avahi-daemon[479]: Registering new address record for fe80::3470:a8ff:fe2b:658c on team0.*.
+[root@server0 network-scripts]#
+[root@server0 network-scripts]# ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host
+       valid_lft forever preferred_lft forever
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP qlen 1000
+    link/ether 52:54:00:00:00:0b brd ff:ff:ff:ff:ff:ff
+    inet 172.25.0.11/24 brd 172.25.0.255 scope global dynamic eth0
+       valid_lft 21010sec preferred_lft 21010sec
+    inet6 fe80::5054:ff:fe00:b/64 scope link
+       valid_lft forever preferred_lft forever
+4: eno1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast master team0 state UP qlen 1000
+    link/ether 52:64:e4:27:1f:9f brd ff:ff:ff:ff:ff:ff
+6: eno2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast master team0 state UP qlen 1000
+    link/ether 52:64:e4:27:1f:9f brd ff:ff:ff:ff:ff:ff
+9: team0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP
+    link/ether 52:64:e4:27:1f:9f brd ff:ff:ff:ff:ff:ff
+    inet6 fe80::3470:a8ff:fe2b:658c/64 scope link
+       valid_lft forever preferred_lft forever
+10: brteam0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN
+    link/ether 56:ff:5e:71:14:d4 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.0.100/24 brd 192.168.0.255 scope global brteam0
+       valid_lft forever preferred_lft forever
+[root@server0 network-scripts]# vim ifcfg-team0
+[root@server0 network-scripts]# systemctl restart network
+[root@server0 network-scripts]# systemctl status network
+network.service - LSB: Bring up/down networking
+   Loaded: loaded (/etc/rc.d/init.d/network)
+   Active: active (exited) since Sun 2019-06-30 12:09:41 CST; 42s ago
+  Process: 3027 ExecStop=/etc/rc.d/init.d/network stop (code=exited, status=0/SUCCESS)
+  Process: 4300 ExecStart=/etc/rc.d/init.d/network start (code=exited, status=0/SUCCESS)
+
+Jun 30 12:09:41 server0.example.com network[4300]: RTNETLINK answers: File exists
+Jun 30 12:09:41 server0.example.com network[4300]: RTNETLINK answers: File exists
+Jun 30 12:09:41 server0.example.com network[4300]: RTNETLINK answers: File exists
+Jun 30 12:09:41 server0.example.com network[4300]: RTNETLINK answers: File exists
+Jun 30 12:09:41 server0.example.com network[4300]: RTNETLINK answers: File exists
+Jun 30 12:09:41 server0.example.com network[4300]: RTNETLINK answers: File exists
+Jun 30 12:09:41 server0.example.com network[4300]: RTNETLINK answers: File exists
+Jun 30 12:09:41 server0.example.com network[4300]: RTNETLINK answers: File exists
+Jun 30 12:09:41 server0.example.com network[4300]: RTNETLINK answers: File exists
+Jun 30 12:09:41 server0.example.com systemd[1]: Started LSB: Bring up/down networking.
+[root@server0 network-scripts]# cat ifcfg-team0
+DEVICE=team0
+TEAM_CONFIG="{\"runner\":{\"name\":\"activebackup\"}}"
+DEVICETYPE=Team
+BOOTPROTO=dhcp
+DEFROUTE=yes
+PEERDNS=yes
+PEERROUTES=yes
+IPV4_FAILURE_FATAL=no
+IPV6INIT=yes
+IPV6_AUTOCONF=yes
+IPV6_DEFROUTE=yes
+IPV6_PEERDNS=yes
+IPV6_PEERROUTES=yes
+IPV6_FAILURE_FATAL=no
+NAME=team0
+UUID=15ec1645-1af4-457c-84ce-e97c3e1ff531
+ONBOOT=yes
+BRIDGE=brteam0
+HWADDR=52:64:e4:27:1f:9f
+[root@server0 network-scripts]# reboot
+Connection to 172.25.0.11 closed by remote host.
+Connection to 172.25.0.11 closed.
+[kiosk@foundation0 ~]$ rsrv
+Last login: Sun Jun 30 11:36:15 2019 from 172.25.0.250
+[root@server0 ~]# su - student
+[student@server0 ~]$ ping -I brteam0 192.168.0.254
+PING 192.168.0.254 (192.168.0.254) from 192.168.0.100 brteam0: 56(84) bytes of data.
+From 192.168.0.100 icmp_seq=1 Destination Host Unreachable
+From 192.168.0.100 icmp_seq=2 Destination Host Unreachable
+From 192.168.0.100 icmp_seq=3 Destination Host Unreachable
+From 192.168.0.100 icmp_seq=4 Destination Host Unreachable
+From 192.168.0.100 icmp_seq=5 Destination Host Unreachable
+From 192.168.0.100 icmp_seq=6 Destination Host Unreachable
+From 192.168.0.100 icmp_seq=7 Destination Host Unreachable
+From 192.168.0.100 icmp_seq=8 Destination Host Unreachable
+From 192.168.0.100 icmp_seq=9 Destination Host Unreachable
+From 192.168.0.100 icmp_seq=10 Destination Host Unreachable
+From 192.168.0.100 icmp_seq=11 Destination Host Unreachable
+From 192.168.0.100 icmp_seq=12 Destination Host Unreachable
+From 192.168.0.100 icmp_seq=13 Destination Host Unreachable
+From 192.168.0.100 icmp_seq=14 Destination Host Unreachable
+From 192.168.0.100 icmp_seq=15 Destination Host Unreachable
+From 192.168.0.100 icmp_seq=16 Destination Host Unreachable
+^C
+--- 192.168.0.254 ping statistics ---
+19 packets transmitted, 0 received, +16 errors, 100% packet loss, time 18013ms
+pipe 4
+[student@server0 ~]$ ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host
+       valid_lft forever preferred_lft forever
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP qlen 1000
+    link/ether 52:54:00:00:00:0b brd ff:ff:ff:ff:ff:ff
+    inet 172.25.0.11/24 brd 172.25.0.255 scope global dynamic eth0
+       valid_lft 21409sec preferred_lft 21409sec
+    inet6 fe80::5054:ff:fe00:b/64 scope link
+       valid_lft forever preferred_lft forever
+4: eno1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast master team0 state UP qlen 1000
+    link/ether 0e:86:e9:dd:ee:fc brd ff:ff:ff:ff:ff:ff
+    inet6 fe80::c86:e9ff:fedd:eefc/64 scope link
+       valid_lft forever preferred_lft forever
+6: eno2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast master team0 state UP qlen 1000
+    link/ether 0e:86:e9:dd:ee:fc brd ff:ff:ff:ff:ff:ff
+    inet6 fe80::2060:b9ff:fe63:422a/64 scope link
+       valid_lft forever preferred_lft forever
+7: team0: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN
+    link/ether 0e:86:e9:dd:ee:fc brd ff:ff:ff:ff:ff:ff
+8: brteam0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN
+    link/ether 5e:9c:5d:90:ce:cb brd ff:ff:ff:ff:ff:ff
+    inet 192.168.0.100/24 brd 192.168.0.255 scope global brteam0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::5c9c:5dff:fe90:cecb/64 scope link
+       valid_lft forever preferred_lft forever
+[student@server0 ~]$ lab teambridge grade
+
+We trust you have received the usual lecture from the local System
+Administrator. It usually boils down to these three things:
+
+    #1) Respect the privacy of others.
+    #2) Think before you type.
+    #3) With great power comes great responsibility.
+
+[sudo] password for student:
+Confirming teamed inferface exists .... PASS
+It uses specified port interfaces ..... PASS
+Correct team runner implemented ....... PASS
+Confirming bridge exists .............. PASS
+Bridge uses team interface ............ FAIL
+Bridge network settings correct ....... PASS
+[student@server0 ~]$ brtshow
+bash: brtshow: command not found...
+[student@server0 ~]$ brtctl show
+bash: brtctl: command not found...
+[student@server0 ~]$ br
+brandbot        brctl           break           bridge          brltty          brltty-ctb      brltty-install  brltty-trtxt    brltty-ttb
+[student@server0 ~]$ br
+brandbot        brctl           break           bridge          brltty          brltty-ctb      brltty-install  brltty-trtxt    brltty-ttb
+[student@server0 ~]$ brctl show
+bridge name     bridge id               STP enabled     interfaces
+brteam0         8000.000000000000       no
+[student@server0 ~]$ exit
+logout
+[root@server0 ~]# cd /etc/sysconfig/network-scripts/
+[root@server0 network-scripts]# vim ifcfg-team0
+[root@server0 network-scripts]# systemctl restart network
+Job for network.service failed. See 'systemctl status network.service' and 'journalctl -xn' for details.
+[root@server0 network-scripts]# cat ifcfg-team0
+DEVICE=team0
+TEAM_CONFIG="{\"runner\":{\"name\":\"activebackup\"}}"
+DEVICETYPE=Team
+BOOTPROTO=dhcp
+DEFROUTE=yes
+PEERDNS=yes
+PEERROUTES=yes
+IPV4_FAILURE_FATAL=no
+IPV6INIT=yes
+IPV6_AUTOCONF=yes
+IPV6_DEFROUTE=yes
+IPV6_PEERDNS=yes
+IPV6_PEERROUTES=yes
+IPV6_FAILURE_FATAL=no
+NAME=team0
+UUID=15ec1645-1af4-457c-84ce-e97c3e1ff531
+ONBOOT=yes
+BRIDGE=brteam0
+BRIDGE=brteam0
+HWADDR=52:64:e4:27:1f:9f
+[root@server0 network-scripts]# vim ifcfg-team0
+[root@server0 network-scripts]# cat ifcfg-team0
+DEVICE=team0
+TEAM_CONFIG="{\"runner\":{\"name\":\"activebackup\"}}"
+DEVICETYPE=Team
+BOOTPROTO=dhcp
+DEFROUTE=yes
+PEERDNS=yes
+PEERROUTES=yes
+IPV4_FAILURE_FATAL=no
+IPV6INIT=yes
+IPV6_AUTOCONF=yes
+IPV6_DEFROUTE=yes
+IPV6_PEERDNS=yes
+IPV6_PEERROUTES=yes
+IPV6_FAILURE_FATAL=no
+NAME=team0
+UUID=15ec1645-1af4-457c-84ce-e97c3e1ff531
+ONBOOT=yes
+BRIDGE=brteam0
+BRIDGE=brteam0
+HWADDR=52:64:e4:27:1f:9f
+[root@server0 network-scripts]# vim ifcfg-team0
+[root@server0 network-scripts]# cat ifcfg-team0
+DEVICE=team0
+TEAM_CONFIG="{\"runner\":{\"name\":\"activebackup\"}}"
+DEVICETYPE=Team
+BOOTPROTO=dhcp
+DEFROUTE=yes
+PEERDNS=yes
+PEERROUTES=yes
+IPV4_FAILURE_FATAL=no
+IPV6INIT=yes
+IPV6_AUTOCONF=yes
+IPV6_DEFROUTE=yes
+IPV6_PEERDNS=yes
+IPV6_PEERROUTES=yes
+IPV6_FAILURE_FATAL=no
+NAME=team0
+UUID=15ec1645-1af4-457c-84ce-e97c3e1ff531
+ONBOOT=yes
+BRIDGE=brteam0
+HWADDR=52:64:e4:27:1f:9f
+[root@server0 network-scripts]# systemctl restart network
+Job for network.service failed. See 'systemctl status network.service' and 'journalctl -xn' for details.
+[root@server0 network-scripts]# journalctl -xn
+-- Logs begin at Sun 2019-06-30 12:12:50 CST, end at Sun 2019-06-30 12:20:47 CST. --
+Jun 30 12:20:47 server0.example.com network[2821]: RTNETLINK answers: File exists
+Jun 30 12:20:47 server0.example.com network[2821]: RTNETLINK answers: File exists
+Jun 30 12:20:47 server0.example.com network[2821]: RTNETLINK answers: File exists
+Jun 30 12:20:47 server0.example.com network[2821]: RTNETLINK answers: File exists
+Jun 30 12:20:47 server0.example.com network[2821]: RTNETLINK answers: File exists
+Jun 30 12:20:47 server0.example.com network[2821]: RTNETLINK answers: File exists
+Jun 30 12:20:47 server0.example.com network[2821]: RTNETLINK answers: File exists
+Jun 30 12:20:47 server0.example.com systemd[1]: network.service: control process exited, code=exited status=1
+Jun 30 12:20:47 server0.example.com systemd[1]: Failed to start LSB: Bring up/down networking.
+-- Subject: Unit network.service has failed
+-- Defined-By: systemd
+-- Support: http://lists.freedesktop.org/mailman/listinfo/systemd-devel
+--
+-- Unit network.service has failed.
+--
+-- The result is failed.
+Jun 30 12:20:47 server0.example.com systemd[1]: Unit network.service entered failed state.
+[root@server0 network-scripts]# ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host
+       valid_lft forever preferred_lft forever
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP qlen 1000
+    link/ether 52:54:00:00:00:0b brd ff:ff:ff:ff:ff:ff
+    inet 172.25.0.11/24 brd 172.25.0.255 scope global dynamic eth0
+       valid_lft 21113sec preferred_lft 21113sec
+    inet6 fe80::5054:ff:fe00:b/64 scope link
+       valid_lft forever preferred_lft forever
+4: eno1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast master team0 state UP qlen 1000
+    link/ether 0e:86:e9:dd:ee:fc brd ff:ff:ff:ff:ff:ff
+    inet6 fe80::c86:e9ff:fedd:eefc/64 scope link
+       valid_lft forever preferred_lft forever
+6: eno2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast master team0 state UP qlen 1000
+    link/ether 0e:86:e9:dd:ee:fc brd ff:ff:ff:ff:ff:ff
+    inet6 fe80::2060:b9ff:fe63:422a/64 scope link
+       valid_lft forever preferred_lft forever
+7: team0: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN
+    link/ether 0e:86:e9:dd:ee:fc brd ff:ff:ff:ff:ff:ff
+8: brteam0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN
+    link/ether 5e:9c:5d:90:ce:cb brd ff:ff:ff:ff:ff:ff
+    inet 192.168.0.100/24 brd 192.168.0.255 scope global brteam0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::5c9c:5dff:fe90:cecb/64 scope link
+       valid_lft forever preferred_lft forever
+[root@server0 network-scripts]# teamdctl state team0
+Unknown command "team0".
+teamdctl [options] teamdevname command [command args]
+    -h --help                Show this help
+    -v --verbose             Increase output verbosity
+    -o --oneline             Force output to one line if possible
+    -D --force-dbus          Force to use D-Bus interface
+    -Z --force-zmq=ADDRESS   Force to use ZeroMQ interface [-Z[Address]]
+    -U --force-usock         Force to use UNIX domain socket interface
+Commands:
+    config dump
+    config dump noports
+    config dump actual
+    state
+    state dump
+    state view
+    state item get ITEMPATH
+    state item set ITEMPATH VALUE
+    port add PORTDEV
+    port remove PORTDEV
+    port present PORTDEV
+    port config update PORTDEV PORTCONFIG
+    port config dump PORTDEV
+[root@server0 network-scripts]# teamdctl team0 state
+setup:
+  runner: activebackup
+ports:
+  eno1
+    link watches:
+      link summary: up
+      instance[link_watch_0]:
+        name: ethtool
+        link: up
+  eno2
+    link watches:
+      link summary: up
+      instance[link_watch_0]:
+        name: ethtool
+        link: up
+runner:
+  active port: eno1
+[root@server0 network-scripts]# ip link
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP mode DEFAULT qlen 1000
+    link/ether 52:54:00:00:00:0b brd ff:ff:ff:ff:ff:ff
+4: eno1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast master team0 state UP mode DEFAULT qlen 1000
+    link/ether 0e:86:e9:dd:ee:fc brd ff:ff:ff:ff:ff:ff
+6: eno2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast master team0 state UP mode DEFAULT qlen 1000
+    link/ether 0e:86:e9:dd:ee:fc brd ff:ff:ff:ff:ff:ff
+7: team0: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT
+    link/ether 0e:86:e9:dd:ee:fc brd ff:ff:ff:ff:ff:ff
+8: brteam0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN mode DEFAULT
+    link/ether 5e:9c:5d:90:ce:cb brd ff:ff:ff:ff:ff:ff
+[root@server0 network-scripts]# vim ifcfg-team0
+[root@server0 network-scripts]# cat ifcfg-team0
+DEVICE=team0
+TEAM_CONFIG="{\"runner\":{\"name\":\"activebackup\"}}"
+DEVICETYPE=Team
+BOOTPROTO=dhcp
+DEFROUTE=yes
+PEERDNS=yes
+PEERROUTES=yes
+IPV4_FAILURE_FATAL=no
+IPV6INIT=yes
+IPV6_AUTOCONF=yes
+IPV6_DEFROUTE=yes
+IPV6_PEERDNS=yes
+IPV6_PEERROUTES=yes
+IPV6_FAILURE_FATAL=no
+NAME=team0
+UUID=15ec1645-1af4-457c-84ce-e97c3e1ff531
+ONBOOT=yes
+BRIDGE=brteam0
+BRIDGE=brteam0
+HWADDR=0e:86:e9:dd:ee:fc
+[root@server0 network-scripts]# systemctl restart network
+Job for network.service failed. See 'systemctl status network.service' and 'journalctl -xn' for details.
+[root@server0 network-scripts]# ip link
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP mode DEFAULT qlen 1000
+    link/ether 52:54:00:00:00:0b brd ff:ff:ff:ff:ff:ff
+4: eno1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast master team0 state UP mode DEFAULT qlen 1000
+    link/ether 0e:86:e9:dd:ee:fc brd ff:ff:ff:ff:ff:ff
+6: eno2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast master team0 state UP mode DEFAULT qlen 1000
+    link/ether 0e:86:e9:dd:ee:fc brd ff:ff:ff:ff:ff:ff
+7: team0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master brteam0 state UP mode DEFAULT
+    link/ether 0e:86:e9:dd:ee:fc brd ff:ff:ff:ff:ff:ff
+8: brteam0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP mode DEFAULT
+    link/ether 0e:86:e9:dd:ee:fc brd ff:ff:ff:ff:ff:ff
+[root@server0 network-scripts]# vim ifcfg-team0
+[root@server0 network-scripts]# cat ifcfg-team0
+DEVICE=team0
+TEAM_CONFIG="{\"runner\":{\"name\":\"activebackup\"}}"
+DEVICETYPE=Team
+BOOTPROTO=dhcp
+DEFROUTE=yes
+PEERDNS=yes
+PEERROUTES=yes
+IPV4_FAILURE_FATAL=no
+IPV6INIT=yes
+IPV6_AUTOCONF=yes
+IPV6_DEFROUTE=yes
+IPV6_PEERDNS=yes
+IPV6_PEERROUTES=yes
+IPV6_FAILURE_FATAL=no
+NAME=team0
+UUID=15ec1645-1af4-457c-84ce-e97c3e1ff531
+ONBOOT=yes
+BRIDGE=brteam0
+HWADDR=0e:86:e9:dd:ee:fc
+[root@server0 network-scripts]# systemctl restart network
+Job for network.service failed. See 'systemctl status network.service' and 'journalctl -xn' for details.
+[root@server0 network-scripts]# nmcli dev dis team0
+Error: NetworkManager is not running.
+[root@server0 network-scripts]# vim if
+ifcfg-brteam0      ifcfg-team0-port1  ifdown-eth         ifdown-post        ifdown-Team        ifup-aliases       ifup-ipv6          ifup-post          ifup-Team
+ifcfg-eth0         ifcfg-team0-port2  ifdown-ippp        ifdown-ppp         ifdown-TeamPort    ifup-bnep          ifup-isdn          ifup-ppp           ifup-TeamPort
+ifcfg-lo           ifdown             ifdown-ipv6        ifdown-routes      ifdown-tunnel      ifup-eth           ifup-plip          ifup-routes        ifup-tunnel
+ifcfg-team0        ifdown-bnep        ifdown-isdn        ifdown-sit         ifup               ifup-ippp          ifup-plusb         ifup-sit           ifup-wireless
+[root@server0 network-scripts]# vim ifcfg-team0
+[root@server0 network-scripts]# cat ifcfg-team0
+DEVICE=team0
+TEAM_CONFIG="{\"runner\":{\"name\":\"activebackup\"}}"
+DEVICETYPE=Team
+BOOTPROTO=dhcp
+DEFROUTE=yes
+PEERDNS=yes
+PEERROUTES=yes
+IPV4_FAILURE_FATAL=no
+IPV6INIT=yes
+IPV6_AUTOCONF=yes
+IPV6_DEFROUTE=yes
+IPV6_PEERDNS=yes
+IPV6_PEERROUTES=yes
+IPV6_FAILURE_FATAL=no
+NAME=team0
+UUID=15ec1645-1af4-457c-84ce-e97c3e1ff531
+ONBOOT=yes
+BRIDGE=brteam0
+[root@server0 network-scripts]# cat ifcfg-brteam0
+DEVICE=brteam0
+ONBOOT=yes
+TYPE=Bridge
+IPADDR0=192.168.0.100
+PREFIX0=24
+[root@server0 network-scripts]# systemctl restart network
+Job for network.service failed. See 'systemctl status network.service' and 'journalctl -xn' for details.
+[root@server0 network-scripts]# reboot
+Connection to 172.25.0.11 closed by remote host.
+Connection to 172.25.0.11 closed.
+[kiosk@foundation0 ~]$ ping server0
+PING server0.example.com (172.25.0.11) 56(84) bytes of data.
+64 bytes from myser (172.25.0.11): icmp_seq=22 ttl=64 time=23.5 ms
+64 bytes from myser (172.25.0.11): icmp_seq=23 ttl=64 time=0.246 ms
+64 bytes from myser (172.25.0.11): icmp_seq=24 ttl=64 time=0.256 ms
+^C
+--- server0.example.com ping statistics ---
+24 packets transmitted, 3 received, 87% packet loss, time 23003ms
+rtt min/avg/max/mdev = 0.246/8.017/23.551/10.984 ms
+[kiosk@foundation0 ~]$ rsrv
+ssh: connect to host 172.25.0.11 port 22: Connection refused
+[kiosk@foundation0 ~]$ rsrv
+Last login: Sun Jun 30 12:15:07 2019 from 172.25.0.250
+[root@server0 ~]# ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host
+       valid_lft forever preferred_lft forever
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP qlen 1000
+    link/ether 52:54:00:00:00:0b brd ff:ff:ff:ff:ff:ff
+    inet 172.25.0.11/24 brd 172.25.0.255 scope global dynamic eth0
+       valid_lft 21581sec preferred_lft 21581sec
+    inet6 fe80::5054:ff:fe00:b/64 scope link
+       valid_lft forever preferred_lft forever
+4: eno1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast master team0 state UP qlen 1000
+    link/ether ba:69:a6:53:dc:60 brd ff:ff:ff:ff:ff:ff
+    inet6 fe80::b869:a6ff:fe53:dc60/64 scope link
+       valid_lft forever preferred_lft forever
+6: eno2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast master team0 state UP qlen 1000
+    link/ether ba:69:a6:53:dc:60 brd ff:ff:ff:ff:ff:ff
+    inet6 fe80::ac9a:2fff:fef1:cc4b/64 scope link
+       valid_lft forever preferred_lft forever
+7: team0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master brteam0 state UP
+    link/ether ba:69:a6:53:dc:60 brd ff:ff:ff:ff:ff:ff
+    inet6 fe80::b869:a6ff:fe53:dc60/64 scope link
+       valid_lft forever preferred_lft forever
+8: brteam0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP
+    link/ether ba:69:a6:53:dc:60 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.0.100/24 brd 192.168.0.255 scope global brteam0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::b869:a6ff:fe53:dc60/64 scope link
+       valid_lft forever preferred_lft forever
+[root@server0 ~]# ping -I brteam0 192.168.0.254
+PING 192.168.0.254 (192.168.0.254) from 192.168.0.100 brteam0: 56(84) bytes of data.
+64 bytes from 192.168.0.254: icmp_seq=1 ttl=64 time=0.230 ms
+64 bytes from 192.168.0.254: icmp_seq=2 ttl=64 time=0.147 ms
+64 bytes from 192.168.0.254: icmp_seq=3 ttl=64 time=0.526 ms
+64 bytes from 192.168.0.254: icmp_seq=4 ttl=64 time=0.134 ms
+^C
+--- 192.168.0.254 ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3000ms
+rtt min/avg/max/mdev = 0.134/0.259/0.526/0.158 ms
+[root@server0 ~]# lab teambridge grade
+Confirming teamed inferface exists .... PASS
+It uses specified port interfaces ..... PASS
+Correct team runner implemented ....... PASS
+Confirming bridge exists .............. PASS
+Bridge uses team interface ............ PASS
+Bridge network settings correct ....... PASS
+[root@server0 ~]#

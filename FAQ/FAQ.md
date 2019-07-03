@@ -299,6 +299,82 @@ rm: remove write-protected regular empty file ‘lfile2’? y
 [user1@server0 testGroupOwner]$
 
 ```
+## 254 p81 第五步 重置网络以启动新网桥 brtream0 并重新激活 team0 这一步会报错
+
+如按书本操作,
+`````
+
+systemctl  restart network
+`````
+最终会报错
+````
+[root@server0 network-scripts]# systemctl status network.service
+network.service - LSB: Bring up/down networking
+   Loaded: loaded (/etc/rc.d/init.d/network)
+   Active: failed (Result: exit-code) since Sun 2019-06-30 12:03:39 CST; 42s ago
+  Process: 3027 ExecStop=/etc/rc.d/init.d/network stop (code=exited, status=0/SUCCESS)
+  Process: 3957 ExecStart=/etc/rc.d/init.d/network start (code=exited, status=1/FAILURE)
+
+Jun 30 12:03:39 server0.example.com network[3957]: RTNETLINK answers: File exists
+Jun 30 12:03:39 server0.example.com network[3957]: RTNETLINK answers: File exists
+Jun 30 12:03:39 server0.example.com network[3957]: RTNETLINK answers: File exists
+Jun 30 12:03:39 server0.example.com network[3957]: RTNETLINK answers: File exists
+Jun 30 12:03:39 server0.example.com network[3957]: RTNETLINK answers: File exists
+Jun 30 12:03:39 server0.example.com network[3957]: RTNETLINK answers: File exists
+Jun 30 12:03:39 server0.example.com network[3957]: RTNETLINK answers: File exists
+Jun 30 12:03:39 server0.example.com systemd[1]: network.service: control process exited, code=exited status=1
+Jun 30 12:03:39 server0.example.com systemd[1]: Failed to start LSB: Bring up/down networking.
+Jun 30 12:03:39 server0.example.com systemd[1]: Unit network.service entered failed state.
+[root@server0 network-scripts]# journalctl -xn
+-- Logs begin at Sun 2019-06-30 11:19:26 CST, end at Sun 2019-06-30 12:03:40 CST. --
+Jun 30 12:03:39 server0.example.com network[3957]: RTNETLINK answers: File exists
+Jun 30 12:03:39 server0.example.com network[3957]: RTNETLINK answers: File exists
+Jun 30 12:03:39 server0.example.com network[3957]: RTNETLINK answers: File exists
+Jun 30 12:03:39 server0.example.com network[3957]: RTNETLINK answers: File exists
+Jun 30 12:03:39 server0.example.com network[3957]: RTNETLINK answers: File exists
+Jun 30 12:03:39 server0.example.com network[3957]: RTNETLINK answers: File exists
+Jun 30 12:03:39 server0.example.com systemd[1]: network.service: control process exited, code=exited status=1
+Jun 30 12:03:39 server0.example.com systemd[1]: Failed to start LSB: Bring up/down networking.
+-- Subject: Unit network.service has failed
+-- Defined-By: systemd
+-- Support: http://lists.freedesktop.org/mailman/listinfo/systemd-devel
+--
+-- Unit network.service has failed.
+--
+-- The result is failed.
+Jun 30 12:03:39 server0.example.com systemd[1]: Unit network.service entered failed state.
+Jun 30 12:03:40 server0.example.com avahi-daemon[479]: Registering new address record for fe80::3470:a8ff:fe2b:658c on team0.*.
+````
+
+
+解决详见:
+[启动网卡报错（Failed to start LSB: Bring up/down networking ）解决办法总结](https://blog.51cto.com/11863547/1905929)
+
+或下面两个链接更详细
+[CentOS7 Failed to start LSB: Bring up/down networking. 已解决！！！](https://www.cnblogs.com/zyw-205520/p/5328887.html)
+[三种方法解决 Failed to start LSB: Bring up/down networking 问题](https://blog.csdn.net/qq_21398167/article/details/46694179)
+
+
+```
+
+找到解决方法，说是centos7没有70-persistent-net.rules这个文件，所以新克隆的机器需要配置mac地址。
+
+通过ip a命令查看mac地址是00:0c:29:0c:15:49 
+
+2: eno16777736: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP qlen 1000
+    link/ether 00:0c:29:0c:15:49 brd ff:ff:ff:ff:ff:ff
+然后在配置文件中加入这一行（如果存在的话只修改就可以）
+
+HWADDR=00:0c:29:0c:15:49
+```
+
+这样也可以运行`systemctl restart network`不报错, 但是...但是这样的话reboot会报错的,因为我们reboot后ip link看一下, 我们<br>
+eno1 eno2 team0 这几个interface的hwaddr会变的, 因此其实是不能写死的, <br>
+
+所以结论是,第五步可以跳过, 报错就报错, 可以不管,直接往下做就可以了.<br>
+整个过程可以看
+[teambridge_第五步restart network报错日志](./logs/RH254_teambridge_step5_err.log)
+
 
 ## 有同学问到, 用fdisk进行分区时, 不设置分区类型,也能正常地进行,这个是为什么?
 如下图,这个设置的类型对应MBR中的分区信息的分区类型, 
