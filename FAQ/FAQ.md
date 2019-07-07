@@ -459,3 +459,17 @@ EXAMPLE
 
 ### 总结
 这种可能是由于我们的desktop环境问题也可能是红帽课本的问题,现在还不能统一下个结论. 其它能做的同学欢迎也加入讨论
+
+## 为什么恢复密码时, rd.break加上去了,有时会没有反应.卡住在某个地方
+在server中的环境如果没有按lab 先把我们的内核启动参数进行修改, 直接在内核相关一行后面强行加入rd.break是会卡住的(达到不到课本所说的效果)<br>
+![](res/add_rd_break.png)
+<br>
+主要原因在教案及书本都有说如下:<br>
+![](res/add_console_tty1.png)
+不调整的话,应该把输出到了串口中, 而不是tty0(我们默认是启用tty0的,可以在shell中用`w`命令看一下.)<br>
+因此我们可以去掉ttys0去掉,或把tty0,放在ttys0,115200n8之后, 也是可以达到最终目的.<br>
+也可以参考下面网页 <br>
+[Linux Serial Console](https://www.kernel.org/doc/html/latest/admin-guide/serial-console.html)
+
+
+
