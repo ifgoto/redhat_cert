@@ -465,7 +465,7 @@ EXAMPLE
 ![](res/add_rd_break.png)
 <br>
 主要原因在教案及书本都有说如下:<br>
-![](res/add_console_tty1.png)
+![](../Day08/res/add_console_tty1.png)
 不调整的话,应该把输出到了串口中, 而不是tty0(我们默认是启用tty0的,可以在shell中用`w`命令看一下.)<br>
 因此我们可以去掉ttys0去掉,或把tty0,放在ttys0,115200n8之后, 也是可以达到最终目的.<br>
 也可以参考下面网页 <br>
