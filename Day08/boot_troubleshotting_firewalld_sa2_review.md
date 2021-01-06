@@ -4,6 +4,9 @@ plan
 # 1. 启动过程中的故障排查
 
 ## 1.1 ???
+markdown语法：
+[to_be_link](#id_name)
+
 
 
 ## 1.2 RHEL7启动过程
@@ -216,7 +219,8 @@ password_pbkdf2 root grub.pbkdf2.sha512.10000.9CA4611006FE96BC77A...
 修改内核参数出错后, 可以esc退出本次的修改, 再按e进入重新编辑
 
 ## 1.7 修复加载器出问题(bootloader)
-
+标题：
+## 2.aaa <a name="id_name"></a>
 ## 
 pstree可以看到现在各个进程间的关系
 
